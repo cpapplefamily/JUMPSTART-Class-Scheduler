@@ -19,32 +19,26 @@ var (
 	breakMinutes           = 15
 )
 
-type Block struct{ ID int; StartTime, EndTime string }
-type Session struct{ ClassroomID int; StartTime, EndTime, Title, Presenter, Description string }
-type Classroom struct{ ID int; Name string }
-
-/* func ensureDefaultBlocks() {
-    if len(blocksCache) > 0 {
-		log.Printf("%dSchedule blocks found in database → no default blocks needed", len(blocksCache))
-        return // already have blocks
-    }
-
-    log.Println("No schedule found → creating default 1 time blocks")
-    blocksCache = []Block{
-        {ID: 1, StartTime: "08:00", EndTime: "09:30"},
-    }
-    saveBlocksToDB()
+type Block struct{
+	ID 			int; 
+	StartTime	string;
+	EndTime 	string 
 }
 
-func OpenDBAndLoadCaches() {
-	var err error
-	DB, err = sql.Open("sqlite", "scheduler.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	createTables()
-	loadCaches()
-} */
+type Session struct{
+	ClassroomID int; 
+	StartTime 	string;
+	EndTime 	string;
+	Title 		string;
+	Presenter 	string;
+	Description string
+}
+
+type Classroom struct{
+	ID int; 
+	Name string 
+}
+
 
 func createTables() {
 	classroomsSQL := `
@@ -95,68 +89,6 @@ func createTables() {
 	}
 }
 
-/* func loadCaches() {
-    mu.Lock()
-    defer mu.Unlock()
-
-    loadClassroomsFromDB()
-    loadSessionsFromDB()
-    loadBlocksFromDB()
-    ensureDefaultBlocks()   // ← THIS LINE IS CRITICAL
-    loadSettingsFromDB()
-}
-
-func loadSessionsFromDB() {
-	sessionsCache = make(map[int][]Session)
-	rows, err := DB.Query("SELECT classroom_id, start_time, end_time, title, presenter, description FROM sessions ORDER BY classroom_id")
-	if err != nil {
-		log.Fatal("Failed to load sessions:", err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var s Session
-		var classroomID int
-		if err := rows.Scan(&classroomID, &s.StartTime, &s.EndTime, &s.Title, &s.Presenter, &s.Description); err != nil {
-			log.Fatal(err)
-		}
-		s.ClassroomID = classroomID
-		sessionsCache[classroomID] = append(sessionsCache[classroomID], s)
-	}
-}
-
-func loadClassroomsFromDB() {
-	classroomsCache = make(map[int]*Classroom)
-	rows, err := DB.Query("SELECT id, name FROM classrooms ORDER BY id")
-	if err != nil {
-		log.Fatal("Failed to load classrooms:", err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var cl Classroom
-		if err := rows.Scan(&cl.ID, &cl.Name); err != nil {
-			log.Fatal(err)
-		}
-		classroomsCache[cl.ID] = &cl
-	}
-	if len(classroomsCache) == 0 {
-		log.Println("No classrooms found – will be created on first save")
-	}
-}
-
-func loadBlocksFromDB() {
-    blocksCache = blocksCache[:0] // clear
-    rows, err := DB.Query("SELECT id, start_time, end_time FROM blocks ORDER BY id")
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer rows.Close()
-    for rows.Next() {
-        var b Block
-        rows.Scan(&b.ID, &b.StartTime, &b.EndTime)
-        blocksCache = append(blocksCache, b)
-    }
-} */
-
 func saveClassroomsToDB() { 
 	tx, _ := DB.Begin()
 	tx.Exec("DELETE FROM classrooms")
@@ -189,39 +121,6 @@ func saveBlocksToDB()     {
 func saveSetting(k, v string) {
 	DB.Exec("INSERT OR REPLACE INTO settings(key,value) VALUES(?,?)", k, v)
 }
-
-/* func loadSettingsFromDB() {
-	// Session length
-	var val string
-	err := DB.QueryRow("SELECT value FROM settings WHERE key = 'session_length_minutes'").Scan(&val)
-	if err == sql.ErrNoRows {
-		sessionLengthMinutes = 45
-		saveSetting("session_length_minutes", "45")
-		log.Println("No session length setting found → defaulting to 45 minutes")
-	} else if err == nil {
-		sessionLengthMinutes, _ = strconv.Atoi(val)
-	}
-
-	// Break time
-	err = DB.QueryRow("SELECT value FROM settings WHERE key = 'break_minutes'").Scan(&val)
-	if err == sql.ErrNoRows {
-		breakMinutes = 15
-		saveSetting("break_minutes", "15")
-		log.Println("No break minutes setting found → defaulting to 15 minutes")
-	} else if err == nil {
-		breakMinutes, _ = strconv.Atoi(val)
-	}
-}
-
-func countTotalSessions() int {
-	total := 0
-	for _, sess := range sessionsCache {
-		total += len(sess)
-	}
-	return total
-} */
-
-
 
 // Public function called from main.go
 func OpenDBAndLoadCaches() {

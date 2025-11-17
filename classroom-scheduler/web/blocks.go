@@ -10,6 +10,14 @@ import (
 
 func BlocksHandler(w http.ResponseWriter, r *http.Request) {
 	mu.RLock()
+
+	// Classrooms count
+	num := len(classroomsCache)
+	if num == 0 {
+		// default
+		num = 3
+	}	
+
 	data := struct {
 		Blocks               []Block
 		BlockCount           int
@@ -19,7 +27,7 @@ func BlocksHandler(w http.ResponseWriter, r *http.Request) {
 	}{
 		Blocks:               blocksCache,
 		BlockCount:           len(blocksCache),
-		NumClassrooms:        len(classroomsCache),
+		NumClassrooms:        num,
 		DefaultSessionLength: sessionLengthMinutes,
 		BreakMinutes:         breakMinutes,
 	}
