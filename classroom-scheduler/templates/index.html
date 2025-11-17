@@ -1,17 +1,57 @@
 <!DOCTYPE html>
-<html>
-<head><title>Classrooms</title></head>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classroom Scheduler</title>
+  <style>
+    body {font-family:Arial;background:#f0f4f8;margin:0;padding:2rem;color:#333;}
+    h1 {text-align:center;color:#0066cc;margin-bottom:2rem;}
+    .grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:2rem;max-width:1400px;margin:0 auto;}
+    .card {background:white;border-radius:16px;box-shadow:0 8px 25px rgba(0,0,0,0.1);overflow:hidden;text-decoration:none;color:inherit;transition:transform 0.2s;}
+    .card:hover {transform:translateY(-8px);box-shadow:0 16px 40px rgba(0,0,0,0.15);}
+    .card h2 {background:#0066cc;color:white;padding:1.5rem;margin:0;text-align:center;font-size:1.4em;}
+    .card .content {padding:1.5rem;}
+    .card .content p {margin:0.5rem 0;color:#555;}
+    .empty {text-align:center;padding:4rem;color:#999;font-size:1.3em;}
+    .links {text-align:center;margin-top:3rem;font-size:1.2em;}
+    .links a {margin:0 1rem;color:#0066cc;text-decoration:none;}
+    .links a:hover {text-decoration:underline;}
+  </style>
+</head>
 <body>
-  <h1>Classrooms</h1>
-  <ul>
-    {{range .}}
-    <li><a href="/classroom/{{.ID}}">Classroom {{.ID}}</a></li>
-    {{end}}
-  </ul>
-  <br><br>
-  <div style="text-align:center;">
-    <a href="/blocks">Time Block Configuration</a> • 
-    <a href="/config">Classamac Configuration</a>
+  <h1>Classroom Scheduler</h1>
+
+  <!-- Fixed: now checks len of .Classrooms, not the whole struct -->
+  {{if gt (len .Classrooms) 0}}
+    <div class="grid">
+      {{range .Classrooms}}
+        <a href="/classroom/{{.ID}}" class="card">
+          <h2>{{.Name}}</h2>
+          <div class="content">
+            {{with index $.Sessions .ID}}
+              {{range $i, $sess := .}}
+                <p><strong>Session {{add $i 1}}:</strong> {{$sess.Title}} <em>({{$sess.StartTime}}–{{$sess.EndTime}})</em></p>
+              {{else}}
+                <p>No sessions scheduled yet</p>
+              {{end}}
+            {{else}}
+              <p>No sessions scheduled yet</p>
+            {{end}}
+          </div>
+        </a>
+      {{end}}
+    </div>
+  {{else}}
+    <div class="empty">
+      No classrooms configured yet.<br><br>
+      <a href="/config" style="color:#0066cc;font-size:1.2em;">Configure Classrooms →</a>
+    </div>
+  {{end}}
+
+  <div class="links">
+    <a href="/config">Configure Classrooms</a> • 
+    <a href="/blocks">Session Length & Schedule</a>
   </div>
 </body>
 </html>

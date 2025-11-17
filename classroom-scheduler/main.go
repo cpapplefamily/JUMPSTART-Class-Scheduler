@@ -237,22 +237,57 @@ func loadCacheFromDB() {
 	mu.Lock()
 	defer mu.Unlock()
 
-	// ... existing classrooms/sessions code ...
-
-	// Load blocks
-	blocksCache = blocksCache[:0] // clear
-	rows, err := db.Query("SELECT id, start_time, end_time FROM blocks ORDER BY id")
+	// ========= 1. Load Classrooms =========
+	classroomsCache = make(map[int]*Classroom)
+	rows, err := db.Query("SELECT id, name FROM classrooms ORDER BY id")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to load classrooms:", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var cl Classroom
+		if err := rows.Scan(&cl.ID, &cl.Name); err != nil {
+			log.Fatal(err)
+		}
+		classroomsCache[cl.ID] = &cl
+	}
+	if len(classroomsCache) == 0 {
+		log.Println("No classrooms found – will be created on first save")
+	}
+
+	// ========= 2. Load Sessions =========
+	sessionsCache = make(map[int][]Session)
+	rows, err = db.Query("SELECT classroom_id, start_time, end_time, title, presenter, description FROM sessions ORDER BY classroom_id")
+	if err != nil {
+		log.Fatal("Failed to load sessions:", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var s Session
+		var classroomID int
+		if err := rows.Scan(&classroomID, &s.StartTime, &s.EndTime, &s.Title, &s.Presenter, &s.Description); err != nil {
+			log.Fatal(err)
+		}
+		s.ClassroomID = classroomID
+		sessionsCache[classroomID] = append(sessionsCache[classroomID], s)
+	}
+
+	// ========= 3. Load Blocks (your existing code) =========
+	blocksCache = blocksCache[:0] // clear slice
+	rows, err = db.Query("SELECT id, start_time, end_time FROM blocks ORDER BY id")
+	if err != nil {
+		log.Fatal("Failed to load blocks:", err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var b Block
-		rows.Scan(&b.ID, &b.StartTime, &b.EndTime)
+		if err := rows.Scan(&b.ID, &b.StartTime, &b.EndTime); err != nil {
+			log.Fatal(err)
+		}
 		blocksCache = append(blocksCache, b)
 	}
 	if len(blocksCache) == 0 {
-		// Create default 6 blocks on first run
+		// Default schedule
 		blocksCache = []Block{
 			{1, "08:00", "09:30"},
 			{2, "09:40", "11:10"},
@@ -261,9 +296,24 @@ func loadCacheFromDB() {
 			{5, "15:10", "16:40"},
 			{6, "16:50", "18:20"},
 		}
-		saveBlocksToDB() // persist defaults
+		saveBlocksToDB()
+		log.Println("Created default 6 time blocks")
 	}
-	log.Printf("Loaded %d time blocks", len(blocksCache))
+
+	// ========= 4. Load Settings (session length & break) =========
+	loadSettings() // ← make sure this function exists (see below)
+
+	log.Printf("Loaded %d classrooms, %d session entries, %d blocks", 
+		len(classroomsCache), countTotalSessions(), len(blocksCache))
+}
+
+// Helper to count total sessions (optional, just for nice logging)
+func countTotalSessions() int {
+	total := 0
+	for _, sess := range sessionsCache {
+		total += len(sess)
+	}
+	return total
 }
 
 func saveBlocksToDB() {
@@ -299,14 +349,27 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	mu.RLock()
+	defer mu.RUnlock()
+
 	list := make([]*Classroom, 0, len(classroomsCache))
 	for _, cl := range classroomsCache {
 		list = append(list, cl)
 	}
-	mu.RUnlock()
-
 	sort.Slice(list, func(i, j int) bool { return list[i].ID < list[j].ID })
-	templates.ExecuteTemplate(w, "index.html", list)
+
+	data := struct {
+		Classrooms []*Classroom
+		Sessions   map[int][]Session
+	}{
+		Classrooms: list,
+		Sessions:   sessionsCache,
+	}
+
+	if err := templates.ExecuteTemplate(w, "index.html", data); err != nil {
+		log.Printf("Template error (index): %v", err)
+		http.Error(w, "Template error", http.StatusInternalServerError)
+		return
+	}
 }
 
 func classroomHandler(w http.ResponseWriter, r *http.Request) {
@@ -394,72 +457,81 @@ func configSaveHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := r.ParseForm(); err != nil {
-		http.Error(w, "Bad form", 400)
-		return
+	r.ParseForm()
+	numClassrooms, _ := strconv.Atoi(r.FormValue("num_classrooms"))
+	if numClassrooms < 1 {
+		numClassrooms = 1
+	}
+	if numClassrooms > 30 {
+		numClassrooms = 30
 	}
 
-	numRooms, _ := strconv.Atoi(r.FormValue("num_classrooms"))
-	if numRooms < 1 {
-		numRooms = 1
-	}
-	if numRooms > 50 {
-		numRooms = 50
-	}
+	mu.Lock()
+	defer mu.Unlock()
 
-	tx, err := db.Begin()
-	if err != nil {
-		log.Println(err)
-		http.Error(w, "DB error", 500)
-		return
-	}
-
-	// Clear everything
-	tx.Exec("DELETE FROM sessions")
-	tx.Exec("DELETE FROM classrooms")
-
-	// Create new classrooms
-	stmtClass, _ := tx.Prepare("INSERT INTO classrooms (id, name) VALUES (?, ?)")
-	defer stmtClass.Close()
-
-	stmtSess, _ := tx.Prepare(`
-		INSERT INTO sessions (classroom_id, start_time, end_time, title, presenter, description)
-		VALUES (?, ?, ?, ?, ?, ?)`)
-	defer stmtSess.Close()
-
-	for i := 1; i <= numRooms; i++ {
+	// 1. Save classrooms
+	classroomsCache = make(map[int]*Classroom)
+	for i := 1; i <= numClassrooms; i++ {
 		name := r.FormValue(fmt.Sprintf("roomname_%d", i))
 		if name == "" {
 			name = fmt.Sprintf("Classroom %d", i)
 		}
-		stmtClass.Exec(i, name)
-
-		// Parse sessions for this room (up to 20 per room)
-		for j := 0; j < 20; j++ {
-			start := r.FormValue(fmt.Sprintf("start_%d_%d", i, j))
-			if start == "" {
-				continue
-			}
-			end := r.FormValue(fmt.Sprintf("end_%d_%d", i, j))
-			title := r.FormValue(fmt.Sprintf("title_%d_%d", i, j))
-			presenter := r.FormValue(fmt.Sprintf("presenter_%d_%d", i, j))
-			desc := r.FormValue(fmt.Sprintf("desc_%d_%d", i, j))
-
-			if title == "" || presenter == "" {
-				continue
-			}
-
-			stmtSess.Exec(i, start, end, title, presenter, desc)
-		}
+		classroomsCache[i] = &Classroom{ID: i, Name: name}
 	}
 
+	// 2. Save all sessions (one per global block)
+	sessionsCache = make(map[int][]Session)
+	for classroomID := 1; classroomID <= numClassrooms; classroomID++ {
+		var roomSessions []Session
+		for idx := 0; idx < len(blocksCache); idx++ {
+			title := r.FormValue(fmt.Sprintf("title_%d_%d", classroomID, idx))
+			presenter := r.FormValue(fmt.Sprintf("presenter_%d_%d", classroomID, idx))
+			desc := r.FormValue(fmt.Sprintf("desc_%d_%d", classroomID, idx))
+
+			// Use global block times (even if user changed them manually, we trust the global ones)
+			start := blocksCache[idx].StartTime
+			end := blocksCache[idx].EndTime
+
+			roomSessions = append(roomSessions, Session{
+				ClassroomID: classroomID,
+				StartTime:   start,
+				EndTime:     end,
+				Title:       title,
+				Presenter:   presenter,
+				Description: desc,
+			})
+		}
+		sessionsCache[classroomID] = roomSessions
+	}
+
+	// 3. Persist to DB
+	saveClassroomsToDB()
+	saveSessionsToDB()
+
+	log.Printf("Saved %d classrooms and their sessions", numClassrooms)
+	http.Redirect(w, r, "/config", http.StatusSeeOther)
+}
+
+func saveClassroomsToDB() {
+	tx, _ := db.Begin()
+	tx.Exec("DELETE FROM classrooms")
+	stmt, _ := tx.Prepare("INSERT INTO classrooms (id, name) VALUES (?, ?)")
+	for _, cl := range classroomsCache {
+		stmt.Exec(cl.ID, cl.Name)
+	}
 	tx.Commit()
-	log.Printf("Saved configuration: %d classrooms", numRooms)
+}
 
-	// Reload cache
-	loadCacheFromDB()
-
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+func saveSessionsToDB() {
+	tx, _ := db.Begin()
+	tx.Exec("DELETE FROM sessions")
+	stmt, _ := tx.Prepare("INSERT INTO sessions (classroom_id, start_time, end_time, title, presenter, description) VALUES (?, ?, ?, ?, ?, ?)")
+	for classroomID, sessions := range sessionsCache {
+		for _, s := range sessions {
+			stmt.Exec(classroomID, s.StartTime, s.EndTime, s.Title, s.Presenter, s.Description)
+		}
+	}
+	tx.Commit()
 }
 
 func loadSettings() {
