@@ -47,7 +47,8 @@ var (
 	classroomsCache = make(map[int]*Classroom)
 	sessionsCache   = make(map[int][]Session)
 	blocksCache   []Block          // ordered list of blocks
-	defaultBlockMinutes = 45 // default fallback (90 min = 1h30)
+	sessionLengthMinutes = 45 // default fallback (45 min )
+	breakMinutes         = 15   // default break between sessions
 	defaultBlocks = 5              // fallback if nothing saved
 )
 
@@ -55,18 +56,12 @@ var (
 // CRITICAL: This init() must come BEFORE main() and register functions
 // ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
 func init() {
-    funcMap := template.FuncMap{
-        "add": func(a, b int) int {
-            return a + b
-        },
-        "repeat": func(count int) []struct{} {
-            return make([]struct{}, count)
-        },
-        "seq": func(count int) []int {   // ← NEW
+funcMap := template.FuncMap{
+        "add":  func(a, b int) int { return a + b },
+        "sub":  func(a, b int) int { return a - b },
+        "seq":  func(count int) []int {
             s := make([]int, count)
-            for i := 0; i < count; i++ {
-                s[i] = i
-            }
+            for i := 0; i < count; i++ { s[i] = i + 1 }
             return s
         },
     }
@@ -77,7 +72,6 @@ func init() {
     if err != nil {
         log.Fatalf("Failed to parse templates: %v", err)
     }
-    log.Println("Templates loaded successfully (add/repeat/seq functions ready)")
 }
 
 func main() {
@@ -112,14 +106,15 @@ func blocksHandler(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		Blocks              []Block
 		BlockCount          int
-		DefaultBlockMinutes int
+		DefaultSessionLength int
+		BreakMinutes        int
 	}{
 		Blocks:              blocksCache,
 		BlockCount:          len(blocksCache),
-		DefaultBlockMinutes: defaultBlockMinutes,
+		DefaultSessionLength: sessionLengthMinutes,
+		BreakMinutes:        breakMinutes,
 	}
 	mu.RUnlock()
-
 	templates.ExecuteTemplate(w, "blocks.html", data)
 }
 
@@ -130,10 +125,18 @@ func blocksSaveHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	r.ParseForm()
 
-	// Save default length
-	if mins, err := strconv.Atoi(r.FormValue("default_minutes")); err == nil && mins >= 10 && mins <= 300 {
-		defaultBlockMinutes = mins
-		saveDefaultBlockMinutes()
+	// Save settings
+	if v := r.FormValue("session_length"); v != "" {
+		if mins, err := strconv.Atoi(v); err == nil && mins >= 20 && mins <= 300 {
+			sessionLengthMinutes = mins
+			saveSetting("session_length_minutes", v)
+		}
+	}
+	if v := r.FormValue("break_minutes"); v != "" {
+		if mins, err := strconv.Atoi(v); err == nil && mins >= 0 && mins <= 120 {
+			breakMinutes = mins
+			saveSetting("break_minutes", v)
+		}
 	}
 
 	count, _ := strconv.Atoi(r.FormValue("block_count"))
@@ -142,22 +145,42 @@ func blocksSaveHandler(w http.ResponseWriter, r *http.Request) {
 
 	mu.Lock()
 	blocksCache = make([]Block, count)
+
+	var prevEnd time.Time
 	for i := 0; i < count; i++ {
 		idx := i + 1
-		start := r.FormValue(fmt.Sprintf("start_%d", idx))
-		end := r.FormValue(fmt.Sprintf("end_%d", idx))
-		if start == "" { start = "08:00" }
-		if end == "" {
-			// Auto-calculate if empty
-			t, _ := time.Parse("15:04", start)
-			end = t.Add(time.Minute * time.Duration(defaultBlockMinutes)).Format("15:04")
+		startStr := r.FormValue(fmt.Sprintf("start_%d", idx))
+		endStr := r.FormValue(fmt.Sprintf("end_%d", idx))
+
+		var startTime, endTime time.Time
+		var err error
+
+		if startStr != "" {
+			startTime, err = time.Parse("15:04", startStr)
+			if err != nil { startTime = time.Date(0,1,1,8,0,0,0,time.UTC) }
+		} else if i == 0 {
+			startTime = time.Date(0,1,1,8,0,0,0,time.UTC)
+		} else {
+			startTime = prevEnd.Add(time.Minute * time.Duration(breakMinutes))
 		}
-		blocksCache[i] = Block{ID: idx, StartTime: start, EndTime: end}
+
+		if endStr != "" {
+			endTime, _ = time.Parse("15:04", endStr)
+		} else {
+			endTime = startTime.Add(time.Minute * time.Duration(sessionLengthMinutes))
+		}
+
+		blocksCache[i] = Block{
+			ID:        idx,
+			StartTime: startTime.Format("15:04"),
+			EndTime:   endTime.Format("15:04"),
+		}
+		prevEnd = endTime
 	}
 	mu.Unlock()
 
 	saveBlocksToDB()
-	log.Printf("Saved %d blocks with default length %d minutes", len(blocksCache), defaultBlockMinutes)
+	log.Printf("Saved schedule: %d sessions, %d min length, %d min break", len(blocksCache), sessionLengthMinutes, breakMinutes)
 	http.Redirect(w, r, "/blocks", http.StatusSeeOther)
 }
 
@@ -347,13 +370,15 @@ func configHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Classrooms []*Classroom
-		Sessions   map[int][]Session
-		NumRooms   int
+		Classrooms     []*Classroom
+		Sessions       map[int][]Session
+		NumRooms       int
+		GlobalSessions []Block   // ← this line must exist
 	}{
-		Classrooms: list,
-		Sessions:   sessionsCache,
-		NumRooms:   numRooms,
+		Classrooms:     list,
+		Sessions:       sessionsCache,
+		NumRooms:       numRooms,
+		GlobalSessions: blocksCache,
 	}
 
 	if err := templates.ExecuteTemplate(w, "config.html", data); err != nil {
@@ -437,20 +462,27 @@ func configSaveHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func loadDefaultBlockMinutes() {
+func loadSettings() {
+	// Session length
 	var val string
-	err := db.QueryRow("SELECT value FROM settings WHERE key = 'default_block_minutes'").Scan(&val)
+	err := db.QueryRow("SELECT value FROM settings WHERE key = 'session_length_minutes'").Scan(&val)
 	if err == sql.ErrNoRows {
-		defaultBlockMinutes = 90
-		saveDefaultBlockMinutes()
+		sessionLengthMinutes = 80
+		saveSetting("session_length_minutes", "80")
 	} else if err == nil {
-		defaultBlockMinutes, _ = strconv.Atoi(val)
+		sessionLengthMinutes, _ = strconv.Atoi(val)
 	}
-	if defaultBlockMinutes < 10 {
-		defaultBlockMinutes = 90
+
+	// Break time
+	err = db.QueryRow("SELECT value FROM settings WHERE key = 'break_minutes'").Scan(&val)
+	if err == sql.ErrNoRows {
+		breakMinutes = 10
+		saveSetting("break_minutes", "10")
+	} else if err == nil {
+		breakMinutes, _ = strconv.Atoi(val)
 	}
 }
 
-func saveDefaultBlockMinutes() {
-	db.Exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('default_block_minutes', ?)", defaultBlockMinutes)
+func saveSetting(key string, value string) {
+	db.Exec("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", key, value)
 }

@@ -7,18 +7,18 @@
   <style>
     body {font-family:Arial;background:#f5f7fa;margin:2rem;color:#333;}
     h1 {color:#0066cc;text-align:center;}
-    .controls {text-align:center;margin-bottom:2rem;}
+    .controls {text-align:center;margin-bottom:2rem;font-size:1.1em;}
     .classrooms-grid {display:flex;flex-wrap:wrap;gap:1.5rem;overflow-x:auto;padding:1rem;}
-    .room-card {background:white;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);padding:1.5rem;width:380px;flex:0 0 380px;border:1px solid #ddd;}
-    .room-card h2 {margin-top:0;color:#0066cc;border-bottom:2px solid #0066cc;padding-bottom:0.5rem;}
+    .room-card {background:white;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);padding:1.8rem;width:400px;flex:0 0 400px;border:1px solid #ddd;}
+    .room-card h2 {margin:0 0 1rem 0;color:#0066cc;border-bottom:2px solid #0066cc;padding-bottom:0.5rem;}
     label {font-weight:bold;display:block;margin-top:1rem;}
-    input, textarea, select {
-      width:100%;padding:0.6rem;margin-top:0.4rem;border:1px solid #ccc;border-radius:6px;box-sizing:border-box;font-size:1em;
-    }
-    input[type="time"] {font-family:monospace;}
-    .session {background:#f9f9ff;padding:1rem;margin:0.8rem 0;border-radius:8px;border:1px dashed #aaa;}
-    .btn-save {display:block;width:300px;margin:3rem auto;padding:1rem;font-size:1.3em;background:#0066cc;color:white;border:none;border-radius:8px;cursor:pointer;}
-    .btn-save:hover {background:#0055aa;}
+    input, textarea {width:100%;padding:0.7rem;margin-top:0.4rem;border:1px solid #ccc;border-radius:6px;box-sizing:border-box;font-size:1em;}
+    .session {background:#f8f9ff;padding:1.3rem;margin:1.2rem 0;border-radius:10px;border-left:5px solid #0066cc;}
+    .time-fields {display:flex;gap:1rem;margin-top:0.6rem;}
+    .time-fields input {flex:1;font-family:monospace;background:#fff;}
+    .btn-save {display:block;width:340px;margin:3rem auto;padding:1.3rem;font-size:1.5em;background:#0066cc;color:white;border:none;border-radius:12px;cursor:pointer;box-shadow:0 6px 20px rgba(0,102,204,0.3);}
+    .btn-save:hover {background:#0055aa;transform:translateY(-2px);}
+    .links {text-align:center;margin-top:2rem;font-size:1.1em;}
   </style>
 </head>
 <body>
@@ -27,8 +27,8 @@
   <form method="POST" action="/config/save">
     <div class="controls">
       <strong>Number of Classrooms:</strong>
-      <input type="number" name="num_classrooms" min="1" max="30" value="{{.NumRooms}}" required style="width:80px;">
-      <em>← change and click Save</em>
+      <input type="number" name="num_classrooms" min="1" max="30" value="{{.NumRooms}}" required style="width:90px;padding:0.6rem;">
+      <em> ← change and click Save</em>
     </div>
 
     <div class="classrooms-grid">
@@ -36,38 +36,57 @@
       <div class="room-card">
         <h2>Classroom {{$cl.ID}}</h2>
         <label>Room Name</label>
-        <input type="text" name="roomname_{{$cl.ID}}" value="{{$cl.Name}}" placeholder="e.g., Main Auditorium">
+        <input type="text" name="roomname_{{$cl.ID}}" value="{{$cl.Name}}" placeholder="e.g., Room 101">
 
-        {{$existing := index $.Sessions $cl.ID}}
-        {{range $j, $sess := $existing}}
-        <div class="session">
-          <input type="time" name="start_{{$cl.ID}}_{{$j}}" value="{{$sess.StartTime}}" required>
-          <input type="time" name="end_{{$cl.ID}}_{{$j}}"   value="{{$sess.EndTime}}" required>
-          <input type="text" name="title_{{$cl.ID}}_{{$j}}" placeholder="Title" value="{{$sess.Title}}" required>
-          <input type="text" name="presenter_{{$cl.ID}}_{{$j}}" placeholder="Presenter" value="{{$sess.Presenter}}" required>
-          <textarea name="desc_{{$cl.ID}}_{{$j}}" placeholder="Description">{{$sess.Description}}</textarea>
-        </div>
-        {{end}}
+        {{if gt (len $.GlobalSessions) 0}}
+          {{range $sessionIdx := seq (len $.GlobalSessions)}}
+            {{$idx0 := sub $sessionIdx 1}}
+            {{$global := index $.GlobalSessions $idx0}}
 
-        {{$base := len $existing}}
-        {{range $i := seq 6}}
-        <div class="session">
-          <input type="time" name="start_{{$cl.ID}}_{{add $base $i}}" required>
-          <input type="time" name="end_{{$cl.ID}}_{{add $base $i}}" required>
-          <input type="text" name="title_{{$cl.ID}}_{{add $base $i}}" placeholder="Session Title">
-          <input type="text" name="presenter_{{$cl.ID}}_{{add $base $i}}" placeholder="Presenter">
-          <textarea name="desc_{{$cl.ID}}_{{add $base $i}}" placeholder="Description (optional)"></textarea>
-        </div>
+            <!-- Safe way: get existing session only if it exists -->
+            {{$existing := ""}}
+            {{with index $.Sessions $cl.ID}}
+              {{if ge (len .) $sessionIdx}}
+                {{ $existing = index . $idx0 }}
+              {{end}}
+            {{end}}
+
+            <div class="session">
+              <div style="font-weight:bold;color:#0066cc;margin-bottom:0.5rem;">
+                Session {{$sessionIdx}} ({{ $global.StartTime }} – {{ $global.EndTime }})
+              </div>
+
+              <div class="time-fields">
+                <input type="time" name="start_{{$cl.ID}}_{{$idx0}}" value="{{$global.StartTime}}" required>
+                <input type="time" name="end_{{$cl.ID}}_{{$idx0}}" value="{{$global.EndTime}}" required>
+              </div>
+
+              <input type="text" name="title_{{$cl.ID}}_{{$idx0}}"
+                     placeholder="Session Title"
+                     value="{{if $existing}}{{$existing.Title}}{{end}}" required>
+              <input type="text" name="presenter_{{$cl.ID}}_{{$idx0}}"
+                     placeholder="Presenter"
+                     value="{{if $existing}}{{$existing.Presenter}}{{end}}" required>
+              <textarea name="desc_{{$cl.ID}}_{{$idx0}}"
+                        placeholder="Description (optional)">{{if $existing}}{{$existing.Description}}{{end}}</textarea>
+            </div>
+          {{end}}
+        {{else}}
+          <p style="color:#999;text-align:center;padding:2rem;font-style:italic;">
+            No daily schedule defined yet.<br>
+            <a href="/blocks" style="color:#0066cc;">Configure Session Length & Times first →</a>
+          </p>
         {{end}}
       </div>
       {{end}}
     </div>
 
-    <button type="submit" class="btn-save">SAVE ALL CHANGES</button>
+    <button type="submit" class="btn-save">SAVE ALL CLASSROOMS</button>
   </form>
 
-  <div style="text-align:center;margin-top:2rem;">
-    <a href="/blocks">Time Blocks</a> • <a href="/">Classrooms List</a>
+  <div class="links">
+    <a href="/blocks">Session Length & Schedule Settings</a> • 
+    <a href="/">View Today’s Schedule</a>
   </div>
 </body>
 </html>
