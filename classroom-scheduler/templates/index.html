@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><title>Classrooms</title></head>
+<body>
+  <h1>Classrooms</h1>
+  <ul>
+    {{range .}}
+    <li><a href="/classroom/{{.ID}}">Classroom {{.ID}}</a></li>
+    {{end}}
+  </ul>
+  <a href="/config">Configure Classrooms</a>
+</body>
+</html>

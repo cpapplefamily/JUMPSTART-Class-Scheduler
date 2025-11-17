@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head><title>Classroom {{.ID}}</title></head>
+<body>
+  <h1>Classroom {{.ID}} Schedule</h1>
+  <table border="1">
+    <tr><th>Start</th><th>End</th><th>Title</th><th>Presenter</th><th>Description</th></tr>
+    {{range .Sessions}}
+    <tr>
+      <td>{{.StartTime.Format "15:04"}}</td>
+      <td>{{.EndTime.Format "15:04"}}</td>
+      <td>{{.Title}}</td>
+      <td>{{.Presenter}}</td>
+      <td>{{.Description}}</td>
+    </tr>
+    {{end}}
+  </table>
+  <a href="/">Back to Classrooms</a>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Configuration</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; background:#f4f4f4; }
+    .room { border: 1px solid #aaa; padding: 1.5em; margin: 1em 0; background: white; border-radius:8px; }
+    .session { border: 1px dashed #999; padding: 1em; margin: 0.5em 0; background: #fafafa; border-radius:4px; }
+    input, textarea { width: 100%; padding: 0.5em; margin: 0.3em 0; box-sizing: border-box; }
+    button { padding: 1em 2em; font-size: 1.1em; background:#0066cc; color:white; border:none; border-radius:4px; cursor:pointer; }
+    button:hover { background:#0055aa; }
+  </style>
+</head>
+<body>
+  <h1>Classroom Scheduler Configuration</h1>
+
+  <form method="POST" action="/config/save">
+    <p>
+      <strong>Number of Classrooms:</strong>
+      <input type="number" name="num_classrooms" min="1" max="20" value="{{.NumRooms}}" required style="width:80px;">
+      <em>← change and click Save to add/remove rooms</em>
+    </p>
+
+    {{range $idx, $cl := .Classrooms}}
+    <div class="room">
+      <h2>Classroom {{$cl.ID}}</h2>
+
+      <label>Room Name: 
+        <input type="text" name="roomname_{{$cl.ID}}" value="{{$cl.Name}}" placeholder="e.g., Main Auditorium">
+      </label>
+
+      {{/* Existing sessions */}}
+      {{$existingSessions := index $.Sessions $cl.ID}}
+      {{range $j, $sess := $existingSessions}}
+      <div class="session">
+        <input type="text" name="start_{{$cl.ID}}_{{$j}}" placeholder="Start (09:00)" value="{{$sess.StartTime}}" required>
+        <input type="text" name="end_{{$cl.ID}}_{{$j}}" placeholder="End (10:30)" value="{{$sess.EndTime}}" required>
+        <input type="text" name="title_{{$cl.ID}}_{{$j}}" placeholder="Session Title" value="{{$sess.Title}}" required>
+        <input type="text" name="presenter_{{$cl.ID}}_{{$j}}" placeholder="Presenter" value="{{$sess.Presenter}}" required>
+        <textarea name="desc_{{$cl.ID}}_{{$j}}" placeholder="Description (optional)">{{$sess.Description}}</textarea>
+      </div>
+      {{end}}
+
+      {{/* 6 empty slots – now using $i as the counter */}}
+      {{$base := len $existingSessions}}
+      {{range $i := seq 6}}
+      <div class="session">
+        <input type="text" name="start_{{$cl.ID}}_{{add $base $i}}" placeholder="Start (09:00)">
+        <input type="text" name="end_{{$cl.ID}}_{{add $base $i}}" placeholder="End (10:30)">
+        <input type="text" name="title_{{$cl.ID}}_{{add $base $i}}" placeholder="Session Title">
+        <input type="text" name="presenter_{{$cl.ID}}_{{add $base $i}}" placeholder="Presenter">
+        <textarea name="desc_{{$cl.ID}}_{{add $base $i}}" placeholder="Description (optional)"></textarea>
+      </div>
+      {{end}}
+    </div>
+    {{end}}
+
+    <br>
+    <button type="submit">SAVE ALL CHANGES</button>
+  </form>
+
+  <br><a href="/">← Back to Classrooms List</a>
+</body>
+</html>
