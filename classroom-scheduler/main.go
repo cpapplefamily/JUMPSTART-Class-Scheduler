@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"strings"
 
 	_ "modernc.org/sqlite"
 )
@@ -91,6 +92,7 @@ func main() {
 	log.Printf("    Database: %s", dbFile)
 	log.Println("--------------------------------------------------")
 
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/classroom/", classroomHandler)
 	http.HandleFunc("/config", configHandler)
@@ -104,15 +106,17 @@ func main() {
 func blocksHandler(w http.ResponseWriter, r *http.Request) {
 	mu.RLock()
 	data := struct {
-		Blocks              []Block
-		BlockCount          int
+		Blocks          []Block
+		BlockCount      int
+		NumClassrooms   int
 		DefaultSessionLength int
-		BreakMinutes        int
+		BreakMinutes    int
 	}{
-		Blocks:              blocksCache,
-		BlockCount:          len(blocksCache),
+		Blocks:          blocksCache,
+		BlockCount:      len(blocksCache),
+		NumClassrooms:   len(classroomsCache),
 		DefaultSessionLength: sessionLengthMinutes,
-		BreakMinutes:        breakMinutes,
+		BreakMinutes:    breakMinutes,
 	}
 	mu.RUnlock()
 	templates.ExecuteTemplate(w, "blocks.html", data)
@@ -125,7 +129,26 @@ func blocksSaveHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	r.ParseForm()
 
-	// Save settings
+	// === 1. Save Number of Classrooms ===
+	numClassrooms, _ := strconv.Atoi(r.FormValue("num_classrooms"))
+	if numClassrooms < 1 { numClassrooms = 1 }
+	if numClassrooms > 30 { numClassrooms = 30 }
+
+	mu.Lock()
+
+	// Resize classrooms cache (preserve names if possible)
+	newClassrooms := make(map[int]*Classroom)
+	for i := 1; i <= numClassrooms; i++ {
+		if old, exists := classroomsCache[i]; exists {
+			newClassrooms[i] = old
+		} else {
+			newClassrooms[i] = &Classroom{ID: i, Name: fmt.Sprintf("Classroom %d", i)}
+		}
+	}
+	classroomsCache = newClassrooms
+
+	// === 2. Save everything else (sessions length, break, blocks) ===
+	// (your existing code for session_length, break_minutes, and blocks)
 	if v := r.FormValue("session_length"); v != "" {
 		if mins, err := strconv.Atoi(v); err == nil && mins >= 20 && mins <= 300 {
 			sessionLengthMinutes = mins
@@ -143,31 +166,27 @@ func blocksSaveHandler(w http.ResponseWriter, r *http.Request) {
 	if count < 1 { count = 1 }
 	if count > 20 { count = 20 }
 
-	mu.Lock()
 	blocksCache = make([]Block, count)
-
 	var prevEnd time.Time
 	for i := 0; i < count; i++ {
 		idx := i + 1
 		startStr := r.FormValue(fmt.Sprintf("start_%d", idx))
 		endStr := r.FormValue(fmt.Sprintf("end_%d", idx))
 
-		var startTime, endTime time.Time
-		var err error
-
+		var startTime time.Time
 		if startStr != "" {
-			startTime, err = time.Parse("15:04", startStr)
-			if err != nil { startTime = time.Date(0,1,1,8,0,0,0,time.UTC) }
+			startTime, _ = time.Parse("15:04", startStr)
 		} else if i == 0 {
 			startTime = time.Date(0,1,1,8,0,0,0,time.UTC)
 		} else {
 			startTime = prevEnd.Add(time.Minute * time.Duration(breakMinutes))
 		}
 
+		endTime := startTime.Add(time.Minute * time.Duration(sessionLengthMinutes))
 		if endStr != "" {
-			endTime, _ = time.Parse("15:04", endStr)
-		} else {
-			endTime = startTime.Add(time.Minute * time.Duration(sessionLengthMinutes))
+			if t, err := time.Parse("15:04", endStr); err == nil {
+				endTime = t
+			}
 		}
 
 		blocksCache[i] = Block{
@@ -177,10 +196,14 @@ func blocksSaveHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		prevEnd = endTime
 	}
+
 	mu.Unlock()
 
+	// Save everything
+	saveClassroomsToDB()
 	saveBlocksToDB()
-	log.Printf("Saved schedule: %d sessions, %d min length, %d min break", len(blocksCache), sessionLengthMinutes, breakMinutes)
+
+	log.Printf("Saved schedule: %d classrooms, %d sessions/day", numClassrooms, len(blocksCache))
 	http.Redirect(w, r, "/blocks", http.StatusSeeOther)
 }
 
@@ -457,38 +480,47 @@ func configSaveHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	r.ParseForm()
-	numClassrooms, _ := strconv.Atoi(r.FormValue("num_classrooms"))
-	if numClassrooms < 1 {
-		numClassrooms = 1
-	}
-	if numClassrooms > 30 {
-		numClassrooms = 30
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Failed to parse form", http.StatusBadRequest)
+		return
 	}
 
 	mu.Lock()
 	defer mu.Unlock()
 
-	// 1. Save classrooms
-	classroomsCache = make(map[int]*Classroom)
-	for i := 1; i <= numClassrooms; i++ {
-		name := r.FormValue(fmt.Sprintf("roomname_%d", i))
-		if name == "" {
-			name = fmt.Sprintf("Classroom %d", i)
-		}
-		classroomsCache[i] = &Classroom{ID: i, Name: name}
+	// === IMPORTANT: Number of classrooms is now controlled in /blocks ===
+	// So we read it from the cache, NOT from the form!
+	numClassrooms := len(classroomsCache)
+	if numClassrooms == 0 {
+		// Safety fallback — should never happen if /blocks was used first
+		numClassrooms = 3
+		log.Println("Warning: no classrooms defined yet — using fallback of 3")
 	}
 
-	// 2. Save all sessions (one per global block)
-	sessionsCache = make(map[int][]Session)
+	// === 1. Update classroom names only (structure comes from /blocks) ===
+	for i := 1; i <= numClassrooms; i++ {
+		if _, exists := classroomsCache[i]; !exists {
+			classroomsCache[i] = &Classroom{ID: i, Name: fmt.Sprintf("Classroom %d", i)}
+		}
+		// Update name if provided in form
+		if name := r.FormValue(fmt.Sprintf("roomname_%d", i)); name != "" {
+			classroomsCache[i].Name = name
+		}
+	}
+
+	// === 2. Save sessions (title, presenter, desc) — times come from global blocks ===
+	sessionsCache = make(map[int][]Session) // clear old sessions
+
 	for classroomID := 1; classroomID <= numClassrooms; classroomID++ {
 		var roomSessions []Session
-		for idx := 0; idx < len(blocksCache); idx++ {
-			title := r.FormValue(fmt.Sprintf("title_%d_%d", classroomID, idx))
-			presenter := r.FormValue(fmt.Sprintf("presenter_%d_%d", classroomID, idx))
-			desc := r.FormValue(fmt.Sprintf("desc_%d_%d", classroomID, idx))
 
-			// Use global block times (even if user changed them manually, we trust the global ones)
+		// Only loop through existing global blocks
+		for idx := 0; idx < len(blocksCache); idx++ {
+			title := strings.TrimSpace(r.FormValue(fmt.Sprintf("title_%d_%d", classroomID, idx)))
+			presenter := strings.TrimSpace(r.FormValue(fmt.Sprintf("presenter_%d_%d", classroomID, idx)))
+			desc := strings.TrimSpace(r.FormValue(fmt.Sprintf("desc_%d_%d", classroomID, idx)))
+
+			// Always use the global block times (from /blocks page)
 			start := blocksCache[idx].StartTime
 			end := blocksCache[idx].EndTime
 
@@ -504,11 +536,11 @@ func configSaveHandler(w http.ResponseWriter, r *http.Request) {
 		sessionsCache[classroomID] = roomSessions
 	}
 
-	// 3. Persist to DB
+	// === 3. Persist to database ===
 	saveClassroomsToDB()
 	saveSessionsToDB()
 
-	log.Printf("Saved %d classrooms and their sessions", numClassrooms)
+	log.Printf("Config saved: %d classrooms with %d sessions each", numClassrooms, len(blocksCache))
 	http.Redirect(w, r, "/config", http.StatusSeeOther)
 }
 

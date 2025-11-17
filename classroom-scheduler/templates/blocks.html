@@ -3,61 +3,10 @@
 <head>
   <title>Session Length & Schedule</title>
   <meta charset="utf-8">
-  <style>
-    body {font-family:Arial;background:#f5f7fa;margin:0;padding:2rem;color:#333;}
-    .container {max-width:960px;margin:0 auto;background:white;padding:2.5rem;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,0.15);}
-    h1 {color:#0066cc;text-align:center;margin:0 0 0.5rem 0;}
-    .subtitle {text-align:center;color:#555;margin-bottom:2rem;}
-    .settings {background:linear-gradient(135deg,#e3f2fd,#bbdefb);padding:2rem;border-radius:12px;margin-bottom:2rem;text-align:center;}
-    .setting {display:inline-block;margin:0 2rem;}
-    .setting input {width:100px;padding:0.8rem;font-size:1.3em;text-align:center;}
-    table {width:100%;border-collapse:collapse;margin:2rem 0;background:white;}
-    th, td {padding:1.2rem;text-align:center;border:1px solid #ddd;}
-    th {background:#0066cc;color:white;font-size:1.1em;}
-    input[type="time"] {font-family:monospace;padding:0.8rem;width:100%;border-radius:8px;border:1px solid #999;font-size:1.1em;}
-    .controls {text-align:center;margin:2rem 0;}
-    button {padding:1.2rem 3.5rem;font-size:1.4em;background:#0066cc;color:white;border:none;border-radius:12px;cursor:pointer;box-shadow:0 4px 15px rgba(0,102,204,0.4);}
-    button:hover {background:#0055aa;transform:translateY(-2px);}
-    .back {text-align:center;margin-top:3rem;font-size:1.1em;}
-  </style>
-  <script>
-    function updateSchedule() {
-      const length = parseInt(document.getElementById('length').value) || 80;
-      const breakM = parseInt(document.getElementById('break').value) || 10;
-      const rows = document.querySelectorAll('table tr');
-      let prevEnd = null;
-
-      rows.forEach((row, i) => {
-        if (i === 0) return; // header
-        const startInput = row.querySelector('input[name^="start_"]');
-        const endInput = row.querySelector('input[name^="end_"]');
-        if (!startInput) return;
-
-        let startTime = startInput.value;
-        if (!startTime && prevEnd) {
-          const d = new Date(`2020-01-01 ${prevEnd}:00`);
-          d.setMinutes(d.getMinutes() + breakM);
-          startTime = d.toTimeString().slice(0,5);
-          startInput.value = startTime;
-        }
-
-        if (startTime) {
-          const [h, m] = startTime.split(':').map(Number);
-          const d = new Date();
-          d.setHours(h, m, 0, 0);
-          d.setMinutes(d.getMinutes() + length);
-          const endH = String(d.getHours()).padStart(2,'0');
-          const endM = String(d.getMinutes()).padStart(2,'0');
-          if (!endInput.value || endInput.value === endInput.defaultValue) {
-            endInput.value = endH + ':' + endM;
-          }
-          prevEnd = endH + ':' + endM;
-        }
-      });
-    }
-  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link href="/static/css/blocks.css" rel="stylesheet">
 </head>
-<body onload="updateSchedule()">
+<body>
 <div class="container">
   <h1>Daily Schedule Configuration</h1>
   <p class="subtitle">Set default session length and break time — all classrooms follow this schedule</p>
@@ -77,8 +26,18 @@
     </div>
 
     <div class="controls">
-      <strong>Number of Sessions:</strong>
-      <input type="number" name="block_count" min="1" max="20" value="{{.BlockCount}}" required style="width:90px;padding:0.8rem;font-size:1.2em;">
+        <div style="margin-bottom:1.5rem;">
+            <strong>Number of Classrooms:</strong>
+            <input type="number" name="num_classrooms" min="1" max="30" value="{{.NumClassrooms}}" required 
+                style="width:90px;padding:0.8rem;font-size:1.2em;margin-left:10px;">
+            <em>← total rooms in the school</em>
+        </div>
+        <div>
+            <strong>Number of Sessions:</strong>
+            <input type="number" name="block_count" min="1" max="20" value="{{.BlockCount}}" required 
+                style="width:90px;padding:0.8rem;font-size:1.2em;margin-left:10px;">
+            <em>← sessions in the daily schedule</em>
+        </div>
     </div>
 
     <table>
@@ -86,8 +45,8 @@
       {{range $i, $b := .Blocks}}
       <tr>
         <td><strong>Session {{$b.ID}}</strong></td>
-        <td><input type="time" name="start_{{$b.ID}}" value="{{$b.StartTime}}" onchange="updateSchedule()" required></td>
-        <td><input type="time" name="end_{{$b.ID}}" value="{{$b.EndTime}}" required></td>
+        <td><input type="text" class="timepicker" name="start_{{$b.ID}}" value="{{$b.StartTime}}" required></td>
+        <td><input type="text" class="timepicker" name="end_{{$b.ID}}" value="{{$b.EndTime}}" required></td>
       </tr>
       {{end}}
     </table>
@@ -102,5 +61,56 @@
     <a href="/">Classrooms List</a>
   </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  // Initialize Flatpickr AFTER the DOM is fully loaded
+  document.addEventListener("DOMContentLoaded", function() {
+    flatpickr(".timepicker", {
+      enableTime: true,
+      noCalendar: true,
+      dateFormat: "H:i",
+      time_24hr: true,
+      minuteIncrement: 5,
+      allowInput: true,
+    });
+  });
+
+  // Your existing auto-cascade script (unchanged)
+  function updateSchedule() {
+    const length = parseInt(document.getElementById('length').value) || 80;
+    const breakM = parseInt(document.getElementById('break').value) || 10;
+    let prevEnd = null;
+    document.querySelectorAll('table tr').forEach((row, i) => {
+      if (i === 0) return;
+      const startInput = row.querySelector('input[name^="start_"]');
+      const endInput = row.querySelector('input[name^="end_"]');
+      if (!startInput) return;
+
+      let startTime = startInput.value;
+      if (!startTime && prevEnd) {
+        const d = new Date(`2020-01-01 ${prevEnd}:00`);
+        d.setMinutes(d.getMinutes() + breakM);
+        startTime = d.toTimeString().slice(0,5);
+        startInput.value = startTime;
+        startInput._flatpickr.setDate(startTime, true);
+      }
+
+      if (startTime) {
+        const [h, m] = startTime.split(':').map(Number);
+        const d = new Date();
+        d.setHours(h, m, 0, 0);
+        d.setMinutes(d.getMinutes() + length);
+        const endH = String(d.getHours()).padStart(2,'0');
+        const endM = String(d.getMinutes()).padStart(2,'0');
+        if (!endInput.value || endInput.value === endInput.defaultValue) {
+          endInput.value = endH + ':' + endM;
+          if (endInput._flatpickr) endInput._flatpickr.setDate(endH + ':' + endM, true);
+        }
+        prevEnd = endH + ':' + endM;
+      }
+    });
+  }
+</script>
 </body>
 </html>

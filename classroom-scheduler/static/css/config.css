@@ -1,0 +1,90 @@
+body {
+    font-family:Arial;
+    background:#f5f7fa;
+    margin:2rem;
+    color:#333;
+}
+h1 {
+    color:#0066cc;
+    text-align:center;
+}
+.controls {
+    text-align:center;
+    margin-bottom:2rem;
+    font-size:1.1em;
+}
+.classrooms-grid {
+    display:flex;
+    flex-wrap:wrap;
+    gap:1.5rem;
+    overflow-x:auto;
+    padding:1rem;
+}
+.room-card {
+    background:white;
+    border-radius:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    padding:1.8rem;
+    width:400px;
+    flex:0 0 400px;
+    border:1px solid #ddd;
+}
+.room-card h2 {
+    margin:0 0 1rem 0;
+    color:#0066cc;
+    border-bottom:2px solid #0066cc;
+    padding-bottom:0.5rem;
+}
+label {
+    font-weight:bold;
+    display:block;
+    margin-top:1rem;
+}
+input, textarea {
+    width:100%;
+    padding:0.7rem;
+    margin-top:0.4rem;
+    border:1px solid #ccc;
+    border-radius:6px;
+    box-sizing:border-box;
+    font-size:1em;
+}
+.session {
+    background:#f8f9ff;
+    padding:1.3rem;
+    margin:1.2rem 0;
+    border-radius:10px;
+    border-left:5px solid #0066cc;
+}
+.time-fields {
+    display:flex;
+    gap:1rem;
+    margin-top:0.6rem;
+}
+.time-fields input {
+    flex:1;
+    font-family:monospace;
+    background:#fff;
+}
+.btn-save {
+    display:block;
+    width:340px;
+    margin:3rem auto;
+    padding:1.3rem;
+    font-size:1.5em;
+    background:#0066cc;
+    color:white;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    box-shadow:0 6px 20px rgba(0,102,204,0.3);
+}
+.btn-save:hover {
+    background:#0055aa;
+    transform:translateY(-2px);
+}
+.links {
+    text-align:center;
+    margin-top:2rem;
+    font-size:1.1em;
+}

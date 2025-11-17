@@ -4,33 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Classroom Scheduler – Configuration</title>
-  <style>
-    body {font-family:Arial;background:#f5f7fa;margin:2rem;color:#333;}
-    h1 {color:#0066cc;text-align:center;}
-    .controls {text-align:center;margin-bottom:2rem;font-size:1.1em;}
-    .classrooms-grid {display:flex;flex-wrap:wrap;gap:1.5rem;overflow-x:auto;padding:1rem;}
-    .room-card {background:white;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);padding:1.8rem;width:400px;flex:0 0 400px;border:1px solid #ddd;}
-    .room-card h2 {margin:0 0 1rem 0;color:#0066cc;border-bottom:2px solid #0066cc;padding-bottom:0.5rem;}
-    label {font-weight:bold;display:block;margin-top:1rem;}
-    input, textarea {width:100%;padding:0.7rem;margin-top:0.4rem;border:1px solid #ccc;border-radius:6px;box-sizing:border-box;font-size:1em;}
-    .session {background:#f8f9ff;padding:1.3rem;margin:1.2rem 0;border-radius:10px;border-left:5px solid #0066cc;}
-    .time-fields {display:flex;gap:1rem;margin-top:0.6rem;}
-    .time-fields input {flex:1;font-family:monospace;background:#fff;}
-    .btn-save {display:block;width:340px;margin:3rem auto;padding:1.3rem;font-size:1.5em;background:#0066cc;color:white;border:none;border-radius:12px;cursor:pointer;box-shadow:0 6px 20px rgba(0,102,204,0.3);}
-    .btn-save:hover {background:#0055aa;transform:translateY(-2px);}
-    .links {text-align:center;margin-top:2rem;font-size:1.1em;}
-  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link href="/static/css/config.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 <body>
   <h1>Classroom Scheduler – Configuration</h1>
 
   <form method="POST" action="/config/save">
-    <div class="controls">
-      <strong>Number of Classrooms:</strong>
-      <input type="number" name="num_classrooms" min="1" max="30" value="{{.NumRooms}}" required style="width:90px;padding:0.6rem;">
-      <em> ← change and click Save</em>
-    </div>
-
     <div class="classrooms-grid">
       {{range $idx, $cl := .Classrooms}}
       <div class="room-card">
@@ -57,8 +38,8 @@
               </div>
 
               <div class="time-fields">
-                <input type="time" name="start_{{$cl.ID}}_{{$idx0}}" value="{{$global.StartTime}}" required>
-                <input type="time" name="end_{{$cl.ID}}_{{$idx0}}" value="{{$global.EndTime}}" required>
+                <input type="text" class="timepicker" name="start_{{$cl.ID}}_{{$idx0}}" value="{{$global.StartTime}}" required>
+                <input type="text" class="timepicker" name="end_{{$cl.ID}}_{{$idx0}}" value="{{$global.EndTime}}" required>
               </div>
 
               <input type="text" name="title_{{$cl.ID}}_{{$idx0}}"
@@ -88,5 +69,17 @@
     <a href="/blocks">Session Length & Schedule Settings</a> • 
     <a href="/">View Today’s Schedule</a>
   </div>
+  <script>
+  flatpickr(".timepicker", {
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: "H:i",
+    time_24hr: true,
+    minuteIncrement: 5,
+    static: true,                 // keeps picker attached (beautiful on mobile)
+    allowInput: true,             // user can still type
+    clickOpens: true,
+  });
+</script>
 </body>
 </html>
