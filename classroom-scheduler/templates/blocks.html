@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Time Block Configuration</title>
+  <meta charset="utf-8">
+  <style>
+    body {font-family:Arial;background:#f5f7fa;margin:0;padding:2rem;color:#333;}
+    .container {max-width:960px;margin:0 auto;background:white;padding:2rem;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.15);}
+    h1 {color:#0066cc;text-align:center;margin-bottom:0.5rem;}
+    .subtitle {text-align:center;color:#555;margin-bottom:2rem;}
+    .settings {background:#f0f7ff;padding:1.5rem;border-radius:8px;margin-bottom:2rem;text-align:center;}
+    table {width:100%;border-collapse:collapse;margin:2rem 0;}
+    th, td {padding:1rem;text-align:center;border:1px solid #ddd;}
+    th {background:#0066cc;color:white;}
+    input[type="time"] {font-family:monospace;padding:0.6rem;width:100%;border-radius:6px;border:1px solid #ccc;}
+    .controls {text-align:center;margin:2rem 0;}
+    button {padding:1rem 3rem;font-size:1.3em;background:#0066cc;color:white;border:none;border-radius:8px;cursor:pointer;}
+    button:hover {background:#0055aa;}
+    .back {text-align:center;margin-top:2rem;}
+  </style>
+  <script>
+    function updateEndTime(input) {
+      const start = input.value;
+      if (!start) return;
+      const mins = parseInt(document.getElementById('default_mins').value) || 90;
+      const [h, m] = start.split(':').map(Number);
+      const date = new Date();
+      date.setHours(h, m, 0, 0);
+      date.setMinutes(date.getMinutes() + mins);
+      const endH = String(date.getHours()).padStart(2, '0');
+      const endM = String(date.getMinutes()).padStart(2, '0');
+      const endInput = input.closest('tr').querySelector('input[name^="end_"]');
+      if (endInput && (!endInput.value || endInput.value === endInput.defaultValue)) {
+        endInput.value = endH + ':' + endM;
+      }
+    }
+  </script>
+</head>
+<body>
+<div class="container">
+  <h1>Time Block Configuration</h1>
+  <p class="subtitle">Define global schedule blocks used across all classrooms</p>
+
+  <form method="POST" action="/blocks/save">
+    <div class="settings">
+      <strong>Default Block Length (minutes):</strong>
+      <input type="number" id="default_mins" name="default_minutes" min="10" max="300" value="{{.DefaultBlockMinutes}}" style="width:100px;margin-left:10px;padding:0.5rem;font-size:1.2em;">
+      <em> ← change start time → end time auto-updates</em>
+    </div>
+
+    <div class="controls">
+      <strong>Number of Blocks:</strong>
+      <input type="number" name="block_count" min="1" max="20" value="{{.BlockCount}}" required style="width:80px;padding:0.5rem;">
+    </div>
+
+    <table>
+      <tr><th>Block</th><th>Start Time</th><th>End Time</th></tr>
+      {{range $i, $b := .Blocks}}
+      <tr>
+        <td><strong>Block {{$b.ID}}</strong></td>
+        <td><input type="time" name="start_{{$b.ID}}" value="{{$b.StartTime}}" required onchange="updateEndTime(this)"></td>
+        <td><input type="time" name="end_{{$b.ID}}" value="{{$b.EndTime}}" required></td>
+      </tr>
+      {{end}}
+    </table>
+
+    <div style="text-align:center;">
+      <button type="submit">SAVE BLOCK CONFIGURATION</button>
+    </div>
+  </form>
+
+  <div class="back">
+    <a href="/config">Classroom Configuration</a> • 
+    <a href="/">Classrooms List</a>
+  </div>
+</div>
+</body>
+</html>

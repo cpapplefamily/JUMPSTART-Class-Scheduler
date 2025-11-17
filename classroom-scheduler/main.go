@@ -19,6 +19,12 @@ const (
 	dbFile = "scheduler.db"
 )
 
+type Block struct {
+	ID        int
+	StartTime string // "08:00"
+	EndTime   string // "08:45"
+}
+
 type Session struct {
 	ID          int
 	ClassroomID int
@@ -40,6 +46,9 @@ var (
 	mu              sync.RWMutex
 	classroomsCache = make(map[int]*Classroom)
 	sessionsCache   = make(map[int][]Session)
+	blocksCache   []Block          // ordered list of blocks
+	defaultBlockMinutes = 45 // default fallback (90 min = 1h30)
+	defaultBlocks = 5              // fallback if nothing saved
 )
 
 // ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
@@ -92,8 +101,64 @@ func main() {
 	http.HandleFunc("/classroom/", classroomHandler)
 	http.HandleFunc("/config", configHandler)
 	http.HandleFunc("/config/save", configSaveHandler) // new endpoint
+	http.HandleFunc("/blocks", blocksHandler)
+    http.HandleFunc("/blocks/save", blocksSaveHandler)
 
 	log.Fatal(http.ListenAndServe(port, logRequest(http.DefaultServeMux)))
+}
+
+func blocksHandler(w http.ResponseWriter, r *http.Request) {
+	mu.RLock()
+	data := struct {
+		Blocks              []Block
+		BlockCount          int
+		DefaultBlockMinutes int
+	}{
+		Blocks:              blocksCache,
+		BlockCount:          len(blocksCache),
+		DefaultBlockMinutes: defaultBlockMinutes,
+	}
+	mu.RUnlock()
+
+	templates.ExecuteTemplate(w, "blocks.html", data)
+}
+
+func blocksSaveHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.NotFound(w, r)
+		return
+	}
+	r.ParseForm()
+
+	// Save default length
+	if mins, err := strconv.Atoi(r.FormValue("default_minutes")); err == nil && mins >= 10 && mins <= 300 {
+		defaultBlockMinutes = mins
+		saveDefaultBlockMinutes()
+	}
+
+	count, _ := strconv.Atoi(r.FormValue("block_count"))
+	if count < 1 { count = 1 }
+	if count > 20 { count = 20 }
+
+	mu.Lock()
+	blocksCache = make([]Block, count)
+	for i := 0; i < count; i++ {
+		idx := i + 1
+		start := r.FormValue(fmt.Sprintf("start_%d", idx))
+		end := r.FormValue(fmt.Sprintf("end_%d", idx))
+		if start == "" { start = "08:00" }
+		if end == "" {
+			// Auto-calculate if empty
+			t, _ := time.Parse("15:04", start)
+			end = t.Add(time.Minute * time.Duration(defaultBlockMinutes)).Format("15:04")
+		}
+		blocksCache[i] = Block{ID: idx, StartTime: start, EndTime: end}
+	}
+	mu.Unlock()
+
+	saveBlocksToDB()
+	log.Printf("Saved %d blocks with default length %d minutes", len(blocksCache), defaultBlockMinutes)
+	http.Redirect(w, r, "/blocks", http.StatusSeeOther)
 }
 
 func createTables() {
@@ -115,11 +180,31 @@ func createTables() {
 		FOREIGN KEY(classroom_id) REFERENCES classrooms(id) ON DELETE CASCADE
 	);`
 
+	blocksSQL := `
+	CREATE TABLE IF NOT EXISTS blocks (
+		id INTEGER PRIMARY KEY,
+		start_time TEXT NOT NULL,
+		end_time TEXT NOT NULL
+	);`
+
 	_, err := db.Exec(classroomsSQL)
 	if err != nil {
 		log.Fatal(err)
 	}
 	_, err = db.Exec(sessionsSQL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = db.Exec(blocksSQL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT
+	);`)
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -129,40 +214,43 @@ func loadCacheFromDB() {
 	mu.Lock()
 	defer mu.Unlock()
 
-	classroomsCache = make(map[int]*Classroom)
-	sessionsCache = make(map[int][]Session)
+	// ... existing classrooms/sessions code ...
 
-	rows, err := db.Query("SELECT id, name FROM classrooms ORDER BY id")
+	// Load blocks
+	blocksCache = blocksCache[:0] // clear
+	rows, err := db.Query("SELECT id, start_time, end_time FROM blocks ORDER BY id")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rows.Close()
-
 	for rows.Next() {
-		var cl Classroom
-		rows.Scan(&cl.ID, &cl.Name)
-		if cl.Name == "" {
-			cl.Name = fmt.Sprintf("Classroom %d", cl.ID)
+		var b Block
+		rows.Scan(&b.ID, &b.StartTime, &b.EndTime)
+		blocksCache = append(blocksCache, b)
+	}
+	if len(blocksCache) == 0 {
+		// Create default 6 blocks on first run
+		blocksCache = []Block{
+			{1, "08:00", "09:30"},
+			{2, "09:40", "11:10"},
+			{3, "11:20", "12:50"},
+			{4, "13:30", "15:00"},
+			{5, "15:10", "16:40"},
+			{6, "16:50", "18:20"},
 		}
-		classroomsCache[cl.ID] = &cl
+		saveBlocksToDB() // persist defaults
 	}
-	log.Printf("Loaded %d classrooms", len(classroomsCache))
+	log.Printf("Loaded %d time blocks", len(blocksCache))
+}
 
-	// Load sessions
-	srows, err := db.Query(`
-		SELECT id, classroom_id, start_time, end_time, title, presenter, description 
-		FROM sessions ORDER BY classroom_id, start_time`)
-	if err != nil {
-		log.Fatal(err)
+func saveBlocksToDB() {
+	tx, _ := db.Begin()
+	tx.Exec("DELETE FROM blocks")
+	stmt, _ := tx.Prepare("INSERT INTO blocks (id, start_time, end_time) VALUES (?, ?, ?)")
+	for _, b := range blocksCache {
+		stmt.Exec(b.ID, b.StartTime, b.EndTime)
 	}
-	defer srows.Close()
-
-	for srows.Next() {
-		var s Session
-		srows.Scan(&s.ID, &s.ClassroomID, &s.StartTime, &s.EndTime, &s.Title, &s.Presenter, &s.Description)
-		sessionsCache[s.ClassroomID] = append(sessionsCache[s.ClassroomID], s)
-	}
-	log.Printf("Loaded sessions for %d classrooms", len(sessionsCache))
+	tx.Commit()
 }
 
 // Middleware: log every request
@@ -347,4 +435,22 @@ func configSaveHandler(w http.ResponseWriter, r *http.Request) {
 	loadCacheFromDB()
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func loadDefaultBlockMinutes() {
+	var val string
+	err := db.QueryRow("SELECT value FROM settings WHERE key = 'default_block_minutes'").Scan(&val)
+	if err == sql.ErrNoRows {
+		defaultBlockMinutes = 90
+		saveDefaultBlockMinutes()
+	} else if err == nil {
+		defaultBlockMinutes, _ = strconv.Atoi(val)
+	}
+	if defaultBlockMinutes < 10 {
+		defaultBlockMinutes = 90
+	}
+}
+
+func saveDefaultBlockMinutes() {
+	db.Exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('default_block_minutes', ?)", defaultBlockMinutes)
 }

@@ -1,64 +1,73 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Configuration</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classroom Scheduler – Configuration</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 2em; background:#f4f4f4; }
-    .room { border: 1px solid #aaa; padding: 1.5em; margin: 1em 0; background: white; border-radius:8px; }
-    .session { border: 1px dashed #999; padding: 1em; margin: 0.5em 0; background: #fafafa; border-radius:4px; }
-    input, textarea { width: 100%; padding: 0.5em; margin: 0.3em 0; box-sizing: border-box; }
-    button { padding: 1em 2em; font-size: 1.1em; background:#0066cc; color:white; border:none; border-radius:4px; cursor:pointer; }
-    button:hover { background:#0055aa; }
+    body {font-family:Arial;background:#f5f7fa;margin:2rem;color:#333;}
+    h1 {color:#0066cc;text-align:center;}
+    .controls {text-align:center;margin-bottom:2rem;}
+    .classrooms-grid {display:flex;flex-wrap:wrap;gap:1.5rem;overflow-x:auto;padding:1rem;}
+    .room-card {background:white;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);padding:1.5rem;width:380px;flex:0 0 380px;border:1px solid #ddd;}
+    .room-card h2 {margin-top:0;color:#0066cc;border-bottom:2px solid #0066cc;padding-bottom:0.5rem;}
+    label {font-weight:bold;display:block;margin-top:1rem;}
+    input, textarea, select {
+      width:100%;padding:0.6rem;margin-top:0.4rem;border:1px solid #ccc;border-radius:6px;box-sizing:border-box;font-size:1em;
+    }
+    input[type="time"] {font-family:monospace;}
+    .session {background:#f9f9ff;padding:1rem;margin:0.8rem 0;border-radius:8px;border:1px dashed #aaa;}
+    .btn-save {display:block;width:300px;margin:3rem auto;padding:1rem;font-size:1.3em;background:#0066cc;color:white;border:none;border-radius:8px;cursor:pointer;}
+    .btn-save:hover {background:#0055aa;}
   </style>
 </head>
 <body>
-  <h1>Classroom Scheduler Configuration</h1>
+  <h1>Classroom Scheduler – Configuration</h1>
 
   <form method="POST" action="/config/save">
-    <p>
+    <div class="controls">
       <strong>Number of Classrooms:</strong>
-      <input type="number" name="num_classrooms" min="1" max="20" value="{{.NumRooms}}" required style="width:80px;">
-      <em>← change and click Save to add/remove rooms</em>
-    </p>
+      <input type="number" name="num_classrooms" min="1" max="30" value="{{.NumRooms}}" required style="width:80px;">
+      <em>← change and click Save</em>
+    </div>
 
-    {{range $idx, $cl := .Classrooms}}
-    <div class="room">
-      <h2>Classroom {{$cl.ID}}</h2>
-
-      <label>Room Name: 
+    <div class="classrooms-grid">
+      {{range $idx, $cl := .Classrooms}}
+      <div class="room-card">
+        <h2>Classroom {{$cl.ID}}</h2>
+        <label>Room Name</label>
         <input type="text" name="roomname_{{$cl.ID}}" value="{{$cl.Name}}" placeholder="e.g., Main Auditorium">
-      </label>
 
-      {{/* Existing sessions */}}
-      {{$existingSessions := index $.Sessions $cl.ID}}
-      {{range $j, $sess := $existingSessions}}
-      <div class="session">
-        <input type="text" name="start_{{$cl.ID}}_{{$j}}" placeholder="Start (09:00)" value="{{$sess.StartTime}}" required>
-        <input type="text" name="end_{{$cl.ID}}_{{$j}}" placeholder="End (10:30)" value="{{$sess.EndTime}}" required>
-        <input type="text" name="title_{{$cl.ID}}_{{$j}}" placeholder="Session Title" value="{{$sess.Title}}" required>
-        <input type="text" name="presenter_{{$cl.ID}}_{{$j}}" placeholder="Presenter" value="{{$sess.Presenter}}" required>
-        <textarea name="desc_{{$cl.ID}}_{{$j}}" placeholder="Description (optional)">{{$sess.Description}}</textarea>
-      </div>
-      {{end}}
+        {{$existing := index $.Sessions $cl.ID}}
+        {{range $j, $sess := $existing}}
+        <div class="session">
+          <input type="time" name="start_{{$cl.ID}}_{{$j}}" value="{{$sess.StartTime}}" required>
+          <input type="time" name="end_{{$cl.ID}}_{{$j}}"   value="{{$sess.EndTime}}" required>
+          <input type="text" name="title_{{$cl.ID}}_{{$j}}" placeholder="Title" value="{{$sess.Title}}" required>
+          <input type="text" name="presenter_{{$cl.ID}}_{{$j}}" placeholder="Presenter" value="{{$sess.Presenter}}" required>
+          <textarea name="desc_{{$cl.ID}}_{{$j}}" placeholder="Description">{{$sess.Description}}</textarea>
+        </div>
+        {{end}}
 
-      {{/* 6 empty slots – now using $i as the counter */}}
-      {{$base := len $existingSessions}}
-      {{range $i := seq 6}}
-      <div class="session">
-        <input type="text" name="start_{{$cl.ID}}_{{add $base $i}}" placeholder="Start (09:00)">
-        <input type="text" name="end_{{$cl.ID}}_{{add $base $i}}" placeholder="End (10:30)">
-        <input type="text" name="title_{{$cl.ID}}_{{add $base $i}}" placeholder="Session Title">
-        <input type="text" name="presenter_{{$cl.ID}}_{{add $base $i}}" placeholder="Presenter">
-        <textarea name="desc_{{$cl.ID}}_{{add $base $i}}" placeholder="Description (optional)"></textarea>
+        {{$base := len $existing}}
+        {{range $i := seq 6}}
+        <div class="session">
+          <input type="time" name="start_{{$cl.ID}}_{{add $base $i}}" required>
+          <input type="time" name="end_{{$cl.ID}}_{{add $base $i}}" required>
+          <input type="text" name="title_{{$cl.ID}}_{{add $base $i}}" placeholder="Session Title">
+          <input type="text" name="presenter_{{$cl.ID}}_{{add $base $i}}" placeholder="Presenter">
+          <textarea name="desc_{{$cl.ID}}_{{add $base $i}}" placeholder="Description (optional)"></textarea>
+        </div>
+        {{end}}
       </div>
       {{end}}
     </div>
-    {{end}}
 
-    <br>
-    <button type="submit">SAVE ALL CHANGES</button>
+    <button type="submit" class="btn-save">SAVE ALL CHANGES</button>
   </form>
 
-  <br><a href="/">← Back to Classrooms List</a>
+  <div style="text-align:center;margin-top:2rem;">
+    <a href="/blocks">Time Blocks</a> • <a href="/">Classrooms List</a>
+  </div>
 </body>
 </html>
