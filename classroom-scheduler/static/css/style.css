@@ -1,0 +1,26 @@
+body {
+    font-family:Arial;
+    background:#f0f4f8;
+    margin:0;
+    padding:2rem;
+    color:#333;
+}
+h1 {
+    text-align:center;
+    color:#0066cc;
+    margin-bottom:2rem;
+}
+h2 {
+    text-align:center;
+    color:#0066cc;
+    margin-bottom:2rem;
+}
+.navbar {
+    /* background:#0066cc; */
+    padding:1rem 2rem;
+    color:white;
+    display:flex;
+    justify-content:space-around;
+    align-items:flex-start;
+    margin-bottom:2rem;
+}

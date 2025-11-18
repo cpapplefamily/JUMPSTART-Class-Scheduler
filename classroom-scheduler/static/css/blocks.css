@@ -1,26 +1,4 @@
-body {
-    font-family:Arial;
-    background:#f5f7fa;
-    margin:0;
-    padding:2rem;
-    color:#333;
-    
-}
-.container {
-    max-width:960px;
-    margin:0 auto;
-    background:white;
-    padding:2.5rem;
-    border-radius:16px;
-    box-shadow:0 10px 40px rgba(0,0,0,0.15);
-    
-}
-h1 {
-    color:#0066cc;
-    text-align:center;
-    margin:0 0 0.5rem 0;
-    
-}
+
 .subtitle {
     text-align:center;
     color:#555;
@@ -100,5 +78,4 @@ button:hover {
     text-align:center;
     margin-top:3rem;
     font-size:1.1em;
-    
 }

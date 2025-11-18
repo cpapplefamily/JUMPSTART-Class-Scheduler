@@ -24,7 +24,7 @@ func ClassroomHandler(w http.ResponseWriter, r *http.Request) {
 	sorted := append([]Session(nil), sess...)
 	sort.Slice(sorted, func(i, j int) bool { return sorted[i].StartTime < sorted[j].StartTime })
 
-	Templates.ExecuteTemplate(w, "classroom.html", struct {
+	RenderTemplate(w, "classroom.html", struct {
 		ID       int
 		Name     string
 		Sessions []Session

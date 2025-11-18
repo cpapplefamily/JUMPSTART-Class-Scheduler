@@ -14,7 +14,7 @@ func main() {
 	web.OpenDBAndLoadCaches()
 
 	// 2. Templates
-	web.InitTemplates()
+	//web.InitTemplates()
 
 	// 3. All routes are now owned by the web package
 	web.SetupRoutes()

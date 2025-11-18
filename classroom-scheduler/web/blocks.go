@@ -9,30 +9,36 @@ import (
 )
 
 func BlocksHandler(w http.ResponseWriter, r *http.Request) {
-	mu.RLock()
+    mu.RLock()
+    data := struct {
+        Blocks               []Block
+        BlockCount           int
+        NumClassrooms        int
+        DefaultSessionLength int
+        BreakMinutes         int
 
-	// Classrooms count
-	num := len(classroomsCache)
-	if num == 0 {
-		// default
-		num = 3
-	}	
+        // Layout fields
+        Active    string
+        PageTitle string
+        Year      int
+        ExtraCSS  []string
+        Flash     string
+    }{
+        Blocks:               blocksCache,
+        BlockCount:           len(blocksCache),
+        NumClassrooms:        len(classroomsCache),
+        DefaultSessionLength: sessionLengthMinutes,
+        BreakMinutes:         breakMinutes,
 
-	data := struct {
-		Blocks               []Block
-		BlockCount           int
-		NumClassrooms        int
-		DefaultSessionLength int
-		BreakMinutes         int
-	}{
-		Blocks:               blocksCache,
-		BlockCount:           len(blocksCache),
-		NumClassrooms:        num,
-		DefaultSessionLength: sessionLengthMinutes,
-		BreakMinutes:         breakMinutes,
-	}
-	mu.RUnlock()
-	Templates.ExecuteTemplate(w, "blocks.html", data)
+        Active:    "blocks",
+        PageTitle: "Schedule Blocks",
+        Year:      time.Now().Year(),
+        ExtraCSS:  []string{"blocks.css"},           // your custom CSS
+        Flash:     r.URL.Query().Get("saved"),       // optional success message
+    }
+    mu.RUnlock()
+
+    RenderTemplate(w, "blocks.html", data)
 }
 
 func BlocksSaveHandler(w http.ResponseWriter, r *http.Request) {

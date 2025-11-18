@@ -1,15 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Classroom Scheduler – Configuration</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <link href="/static/css/config.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-</head>
-<body>
-  <h1>Classroom Scheduler – Configuration</h1>
+{{define "config.html"}}
+{{template "header.html" .}}
+
+  <h2>Classroom Scheduler – Configuration</h2>
 
   <form method="POST" action="/config/save">
     <div class="classrooms-grid">
@@ -64,11 +56,6 @@
 
     <button type="submit" class="btn-save">SAVE ALL CLASSROOMS</button>
   </form>
-
-  <div class="links">
-    <a href="/blocks">Session Length & Schedule Settings</a> • 
-    <a href="/">View Today’s Schedule</a>
-  </div>
   <script>
   flatpickr(".timepicker", {
     enableTime: true,
@@ -81,5 +68,6 @@
     clickOpens: true,
   });
 </script>
-</body>
-</html>
+
+{{template "footer.html" .}}
+{{end}}

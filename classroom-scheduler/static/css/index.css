@@ -1,15 +1,3 @@
-body {
-    font-family:Arial;
-    background:#f0f4f8;
-    margin:0;
-    padding:2rem;
-    color:#333;
-}
-h1 {
-    text-align:center;
-    color:#0066cc;
-    margin-bottom:2rem;
-}
 .grid {
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(300px,1fr));

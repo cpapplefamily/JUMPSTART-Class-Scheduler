@@ -1,68 +1,71 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Session Length & Schedule</title>
-  <meta charset="utf-8">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <link href="/static/css/blocks.css" rel="stylesheet">
-</head>
-<body>
-<div class="container">
-  <h1>Daily Schedule Configuration</h1>
-  <p class="subtitle">Set default session length and break time — all classrooms follow this schedule</p>
+{{define "blocks.html"}}
+{{template "header.html" .}}
 
-  <form method="POST" action="/blocks/save">
+<h2>Daily Schedule Configuration</h2>
+<p class="subtitle">
+    Set default session length and break time — all classrooms follow this schedule
+</p>
+
+<form method="POST" action="/blocks/save">
     <div class="settings">
-      <div class="setting">
-        <strong>Session Length</strong><br>
-        <input type="number" id="length" name="session_length" min="20" max="300" value="{{.DefaultSessionLength}}" onchange="updateSchedule()">
-        <small>minutes</small>
-      </div>
-      <div class="setting">
-        <strong>Break Time</strong><br>
-        <input type="number" id="break" name="break_minutes" min="0" max="120" value="{{.BreakMinutes}}" onchange="updateSchedule()">
-        <small>minutes</small>
-      </div>
+        <div class="setting">
+            <strong>Session Length</strong><br>
+            <input type="number" id="length" name="session_length" min="20" max="300"
+                   value="{{.DefaultSessionLength}}" onchange="updateSchedule()">
+            <small>minutes</small>
+        </div>
+        <div class="setting">
+            <strong>Break Time</strong><br>
+            <input type="number" id="break" name="break_minutes" min="0" max="120"
+                   value="{{.BreakMinutes}}" onchange="updateSchedule()">
+            <small>minutes</small>
+        </div>
     </div>
 
     <div class="controls">
         <div style="margin-bottom:1.5rem;">
             <strong>Number of Classrooms:</strong>
-            <input type="number" name="num_classrooms" min="1" max="30" value="{{.NumClassrooms}}" required 
-                style="width:90px;padding:0.8rem;font-size:1.2em;margin-left:10px;">
+            <input type="number" name="num_classrooms" min="1" max="30" value="{{.NumClassrooms}}" required
+                   style="width:90px;padding:0.8rem;font-size:1.2em;margin-left:10px;">
             <em>← total rooms in the school</em>
         </div>
         <div>
             <strong>Number of Sessions:</strong>
-            <input type="number" name="block_count" min="1" max="20" value="{{.BlockCount}}" required 
-                style="width:90px;padding:0.8rem;font-size:1.2em;margin-left:10px;">
+            <input type="number" name="block_count" min="1" max="20" value="{{.BlockCount}}" required
+                   style="width:90px;padding:0.8rem;font-size:1.2em;margin-left:10px;">
             <em>← sessions in the daily schedule</em>
         </div>
     </div>
 
     <table>
-      <tr><th>Session</th><th>Start Time</th><th>End Time</th></tr>
-      {{range $i, $b := .Blocks}}
-      <tr>
-        <td><strong>Session {{$b.ID}}</strong></td>
-        <td><input type="text" class="timepicker" name="start_{{$b.ID}}" value="{{$b.StartTime}}" onchange="updateSchedule()" required></td>
-        <td><input type="text" class="timepicker" name="end_{{$b.ID}}" value="{{$b.EndTime}}" onchange="updateSchedule()" required></td>
-      </tr>
-      {{end}}
+        <thead>
+            <tr>
+                <th>Session</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Blocks}}
+            <tr>
+                <td><strong>Session {{.ID}}</strong></td>
+                <td>
+                    <input type="text" class="timepicker" name="start_{{.ID}}"
+                           value="{{.StartTime}}" onchange="updateSchedule()" required>
+                </td>
+                <td>
+                    <input type="text" class="timepicker" name="end_{{.ID}}"
+                           value="{{.EndTime}}" onchange="updateSchedule()" required>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
     </table>
 
-    <div style="text-align:center;">
-      <button type="submit">SAVE SCHEDULE</button>
+    <div style="text-align:center;margin:2rem 0;">
+        <button type="submit" class="btn-primary">Save Schedule</button>
     </div>
-  </form>
+</form>
 
-  <div class="back">
-    <a href="/config">Classroom Configuration</a> • 
-    <a href="/">Classrooms List</a>
-  </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="/static/js/blocks.js"></script>
-</body>
-</html>
+{{template "footer.html" .}}
+{{end}}

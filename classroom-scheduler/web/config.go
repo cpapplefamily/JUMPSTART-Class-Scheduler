@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 )
 
@@ -25,12 +26,29 @@ func ConfigHandler(w http.ResponseWriter, r *http.Request) {
 			list[i-1] = &Classroom{ID: i, Name: "Classroom " + strconv.Itoa(i)}
 		}
 	}
+
 	data := struct {
-		Classrooms     []*Classroom
-		Sessions       map[int][]Session
-		GlobalSessions []Block
-	}{list, sessionsCache, blocksCache}
-	Templates.ExecuteTemplate(w, "config.html", data)
+        Classrooms     []*Classroom
+        Sessions       map[int][]Session
+        GlobalSessions []Block
+
+        Active    string
+        PageTitle string
+        Year      int
+        ExtraCSS  []string
+        Flash     string
+    }{
+        Classrooms:     list,
+        Sessions:       sessionsCache,
+        GlobalSessions: blocksCache,
+
+        Active:    "config",
+        PageTitle: "Edit Sessions",
+        Year:      time.Now().Year(),
+        ExtraCSS:  []string{"config.css"},
+        Flash:     r.URL.Query().Get("saved"),
+    }
+	RenderTemplate(w, "config.html", data)
 }
 
 func ConfigSaveHandler(w http.ResponseWriter, r *http.Request) {

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JUMPSTART {{if .PageTitle}} • {{.PageTitle}}{{end}}</title>
+    <!-- Main CSS (always loaded) -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Per-page extra CSS (optional) -->
+    {{range .ExtraCSS}}
+    <link rel="stylesheet" href="/static/css/{{.}}">
+    {{end}}
+    <link rel="icon" href="data:,">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="/" class="logo">JUMPSTART</a></h1>
+            <nav class="navbar">
+                <a href="/" class="{{if eq .Active "home"}}active{{end}}">Home</a>
+                <a href="/blocks" class="{{if eq .Active "blocks"}}active{{end}}">Configure Blocks</a>
+                <a href="/config" class="{{if eq .Active "config"}}active{{end}}">Edit Sessions</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        {{if .Flash}}
+        <div class="flash success">{{.Flash}}</div>
+        {{end}}

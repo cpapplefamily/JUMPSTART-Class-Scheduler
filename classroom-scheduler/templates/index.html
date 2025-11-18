@@ -1,44 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Classroom Scheduler</title>
-  <link href="/static/css/index.css" rel="stylesheet">
-</head>
-<body>
-  <h1>Classroom Scheduler</h1>
+{{define "index.html"}}
+{{template "header.html" .}}
 
-  <!-- Fixed: now checks len of .Classrooms, not the whole struct -->
-  {{if gt (len .Classrooms) 0}}
-    <div class="grid">
-      {{range .Classrooms}}
-        <a href="/classroom/{{.ID}}" class="card">
-          <h2>{{.Name}}</h2>
-          <div class="content">
-            {{with index $.Sessions .ID}}
-              {{range $i, $sess := .}}
-                <p><strong>Session {{add $i 1}}:</strong> {{$sess.Title}} <em>({{$sess.StartTime}}–{{$sess.EndTime}})</em></p>
-              {{else}}
-                <p>No sessions scheduled yet</p>
-              {{end}}
+<h2>Welcome to the Classroom Scheduler</h2>
+
+{{if gt (len .Classrooms) 0}}
+  <div class="grid">
+    {{range .Classrooms}}
+      <a href="/classroom/{{.ID}}" class="card">
+        <h2>{{.Name}}</h2>
+        <div class="content">
+          {{with index $.Sessions .ID}}
+            {{range $i, $sess := .}}
+              <p>
+                <strong>Session {{add $i 1}}:</strong><br>
+                {{if $sess.Title}}{{$sess.Title}}{{else}}<em>No title</em>{{end}}
+                <em>({{$sess.StartTime}}–{{$sess.EndTime}})</em>
+              </p>
             {{else}}
               <p>No sessions scheduled yet</p>
             {{end}}
-          </div>
-        </a>
-      {{end}}
-    </div>
-  {{else}}
-    <div class="empty">
-      No classrooms configured yet.<br><br>
-      <a href="/config" style="color:#0066cc;font-size:1.2em;">Configure Classrooms →</a>
-    </div>
-  {{end}}
-
-  <div class="links">
-    <a href="/config">Configure Classrooms</a> • 
-    <a href="/blocks">Session Length & Schedule</a>
+          {{else}}
+            <p>No sessions scheduled yet</p>
+          {{end}}
+        </div>
+      </a>
+    {{end}}
   </div>
-</body>
-</html>
+{{else}}
+  <div class="empty">
+    <p>No classrooms configured yet.</p>
+    <a href="/config" class="btn-primary">Configure Classrooms →</a>
+  </div>
+{{end}}
+
+
+{{template "footer.html" .}}
+{{end}}
