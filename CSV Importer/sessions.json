@@ -1,0 +1,605 @@
+{
+  "event": "2024 JUMPSTART Training Sessions",
+  "location": "St Cloud State University",
+  "sessions": [
+    {
+      "time_slot": "8:30-9AM",
+      "room": "Upper Level",
+      "title": "Team Check-in",
+      "description": "Team Check-in",
+      "speakers": [
+        "Various / Panel"
+      ],
+      "presenter": "Various / Panel"
+    },
+    {
+      "time_slot": "9:00-9:15AM",
+      "room": "Ballroom",
+      "title": "JUMPSTART Kick Off",
+      "description": "JUMPSTART Kick Off",
+      "speakers": [
+        "Various / Panel"
+      ],
+      "presenter": "Various / Panel"
+    },
+    {
+      "time_slot": "9:25AM - 10:15AM",
+      "round": "Round 1",
+      "room": "Voyageurs South",
+      "title": "Pneumatics",
+      "description": "Overlooking your pneumatics could lead to an ineffective robot.  This session is dedication to showcase the potential for great pneumatic systems and manipultors.",
+      "speakers": [
+        "Team 8516"
+      ],
+      "presenter": "Team 8516"
+    },
+    {
+      "time_slot": "9:25AM - 10:15AM",
+      "round": "Round 1",
+      "room": "Voyageurs North",
+      "title": "FRC 2025 Updates",
+      "description": "This session will review and analyze the recent FIRST blog posts FRC task force updates on regional advancement, field damage, alliance selection, and 2025 game piece preorders. See data on how regional advancement changes would have affected previous seasons, touch and feel a variety of newly legal bumper material, and speculate on possible 2025 game pieces based on what was revealed in the game piece pre-order blog post.",
+      "speakers": [
+        "Team 7028"
+      ],
+      "presenter": "Team 7028"
+    },
+    {
+      "time_slot": "9:25AM - 10:15AM",
+      "round": "Round 1",
+      "room": "Glacier South",
+      "title": "The first, FIRST history lecture",
+      "description": "Why do we study history? To learn from it of course! Mixing history and strategy this class will teach you all of FIRST history and how you can apply it to potential future games.",
+      "speakers": [
+        "Team 3313"
+      ],
+      "presenter": "Team 3313"
+    },
+    {
+      "time_slot": "9:25AM - 10:15AM",
+      "round": "Round 1",
+      "room": "Glacier North",
+      "title": "Safety Beyond Safety Glasses",
+      "description": "It would be going over some of the safety protocols on 4607, SOP's, SDS's, Safety training/rules, ways we promote being safe, etc.",
+      "speakers": [
+        "Team 4607"
+      ],
+      "presenter": "Team 4607"
+    },
+    {
+      "time_slot": "9:25AM - 10:15AM",
+      "round": "Round 1",
+      "room": "Cascade",
+      "title": "Be the team at the top of a Pick List",
+      "description": "This presentation focuses on strategies for becoming a sought-after alliance partner in robotics competitions. It shares lessons learned, emphasizing preparation, maintaining robot reliability, and fostering collaboration. Key points include building a consistent and functional robot, adapting to tournament dynamics, and implementing processes to identify and resolve mechanical issues. Teams are encouraged to prioritize strategic design, execute their roles effectively, and maintain professionalism under pressure. Additional advice highlights keeping a clean and organized pit, being transparent about strengths and weaknesses, and ensuring team members are prepared to discuss the robot during alliance selection. The overarching goal is to build credibility and reliability, making the team a top choice for partnerships.",
+      "speakers": [
+        "Team 4607"
+      ],
+      "presenter": "Team 4607"
+    },
+    {
+      "time_slot": "9:25AM - 10:15AM",
+      "round": "Round 1",
+      "room": "Theater",
+      "title": "Manipulators Part 1",
+      "description": "Part 1: Game Pieces, Intake and Scoring",
+      "speakers": [
+        "Mark Durand"
+      ],
+      "presenter": "Mark Durand"
+    },
+    {
+      "time_slot": "9:25AM - 10:15AM",
+      "round": "Round 1",
+      "room": "Gallery",
+      "title": "Volunteer Experience Panel",
+      "description": "This panel will feature FIRST key volunteers - alumni especially -  that teams in Minnesota, North Dakota, and South Dakota would recognize from participation at the now-6 regional events in the FRC Northland region. This is a panel discussion, with Q\u0026A facilitated by a FIRST Senior Mentor \u0026 the Global Volunteer Coordinator for the FIRST Robotics Competition. Potentially could do this twice, but marked (1) to be safe.",
+      "speakers": [
+        "Laurie Shimizu"
+      ],
+      "presenter": "Laurie Shimizu"
+    },
+    {
+      "time_slot": "9:25AM - 10:15AM",
+      "round": "Round 1",
+      "room": "Alumni Room",
+      "title": "Leadership/Team Structure Roundtable",
+      "description": "Group discussion about team structures and leadership systems. Compare and contrast ideas and discuss pros and cons.",
+      "speakers": [
+        "Various / Panel"
+      ],
+      "presenter": "Various / Panel"
+    },
+    {
+      "time_slot": "9:25AM - 10:15AM",
+      "round": "Round 1",
+      "room": "Mississippi",
+      "title": "Getting the Data",
+      "description": "Learn what data to collect from pre, pit, and match scouting. Then how to sort and analyze the data to be useful for match play and pick lists. We will also discuss several of the scouting programs you could use.",
+      "speakers": [
+        "Team 2855"
+      ],
+      "presenter": "Team 2855"
+    },
+    {
+      "time_slot": "9:25AM - 10:15AM",
+      "round": "Round 1",
+      "room": "Valhalla",
+      "title": "Importance of Networking",
+      "description": "This presentation explores ways to network using LinkedIn and other ways to connect with future employers.  Learn how this can benefit your future by connecting with industry for references or getting internships or future job opportunities.  Insights from student that has used LinkedIn to connect with industry during a trade show and from the mentor that suggested it.  What is the benefits and ways you can get connect?",
+      "speakers": [
+        "Team 8516"
+      ],
+      "presenter": "Team 8516"
+    },
+    {
+      "time_slot": "10:20AM - 11:10AM",
+      "round": "Round 2",
+      "room": "Voyageurs South",
+      "title": "Electrical",
+      "description": "Electrical 101,  Component review and best wiring practices.  From mounting radio to stripping wires correctly.  Discussion of all the components and how the supposed connect together.",
+      "speakers": [
+        "Team 8516",
+        "Team 4607"
+      ],
+      "presenter": "Team 8516, Team 4607"
+    },
+    {
+      "time_slot": "10:20AM - 11:10AM",
+      "round": "Round 2",
+      "room": "Voyageurs North",
+      "title": "Taking Motor Control to the Next Level",
+      "description": "Discover how to optimize your robot's movement and accuracy using PID, FeedForward, and motion profiling.",
+      "speakers": [
+        "Team 7028"
+      ],
+      "presenter": "Team 7028"
+    },
+    {
+      "time_slot": "10:20AM - 11:10AM",
+      "round": "Round 2",
+      "room": "Glacier South",
+      "title": "How to succed in your first year on a FRC team",
+      "description": "Breakdown of 2024 everybot and how building it develops skills and success to excell in frc.",
+      "speakers": [
+        "Team 4607"
+      ],
+      "presenter": "Team 4607"
+    },
+    {
+      "time_slot": "10:20AM - 11:10AM",
+      "round": "Round 2",
+      "room": "Glacier North",
+      "title": "Fueling Your Team: Effective Fundraising Strategies in FRC",
+      "description": "This presentation will guide teams through proven strategies to secure funding, build long-term sponsor relationships, and engage their community. From crafting compelling sponsorship proposals to hosting creative fundraising events, learn how to effectively communicate your team’s mission and value.",
+      "speakers": [
+        "Team 6045"
+      ],
+      "presenter": "Team 6045"
+    },
+    {
+      "time_slot": "10:20AM - 11:10AM",
+      "round": "Round 2",
+      "room": "Cascade",
+      "title": "Pack Challenge: How to use this to up your Leadership team",
+      "description": "This session will discuss what the PACK challenge is and what the benefits of it are.",
+      "speakers": [
+        "Team 4607",
+        "Team 8516"
+      ],
+      "presenter": "Team 4607, Team 8516"
+    },
+    {
+      "time_slot": "10:20AM - 11:10AM",
+      "round": "Round 2",
+      "room": "Theater",
+      "title": "Manipulators Part 2",
+      "description": "Part 2: Lifts, arms and Elevators",
+      "speakers": [
+        "Mark Durand"
+      ],
+      "presenter": "Mark Durand"
+    },
+    {
+      "time_slot": "10:20AM - 11:10AM",
+      "round": "Round 2",
+      "room": "Gallery",
+      "title": "What (New) to Expect at a Regional",
+      "description": "This session will help you get the most out of your competition experience. Get an overview of a FRC regional, including a discussion of the new alliance selection process, regional advancement points model, and some changes to awards.",
+      "speakers": [
+        "Yoji Shmizu"
+      ],
+      "presenter": "Yoji Shmizu"
+    },
+    {
+      "time_slot": "10:20AM - 11:10AM",
+      "round": "Round 2",
+      "room": "Alumni Room",
+      "title": "Awards Roundtable",
+      "description": "Discussion of awards criteria and process",
+      "speakers": [
+        "Various / Panel"
+      ],
+      "presenter": "Various / Panel"
+    },
+    {
+      "time_slot": "10:20AM - 11:10AM",
+      "round": "Round 2",
+      "room": "Mississippi",
+      "title": "Who is the LGBTQ+ Community",
+      "description": "This presentation will cover the meanings of common LGBTQ+ terms. Plus steps your team can take to be supportive of the company",
+      "speakers": [
+        "Team 2855"
+      ],
+      "presenter": "Team 2855"
+    },
+    {
+      "time_slot": "10:20AM - 11:10AM",
+      "round": "Round 2",
+      "room": "Valhalla",
+      "title": "Coding for Cookies",
+      "description": "Coding for Cookies is a great outreach opportunity that promotes STEM and robotics education for young women. Teams will learn how they can invite Girl Scout troops to their robotics facilities to teach them and help them earn their robotics badge.",
+      "speakers": [
+        "Team 4607"
+      ],
+      "presenter": "Team 4607"
+    },
+    {
+      "time_slot": "11:15AM - 12:05PM",
+      "round": "Round 3",
+      "room": "Voyageurs South",
+      "title": "FMEA: The most powerful tool in our team's toolbox",
+      "description": "Failure Modes and Effects Analysis is a process that mitigates and eliminates failures. You will learn how to use a pit checklist and how to document all robot failures.",
+      "speakers": [
+        "Team 4607"
+      ],
+      "presenter": "Team 4607"
+    },
+    {
+      "time_slot": "11:15AM - 12:05PM",
+      "round": "Round 3",
+      "room": "Voyageurs North",
+      "title": "Unraveling Robot Mysteries with Logging and Dashboards",
+      "description": "Learn how to use powerful tools to gain insights into your robot's inner workings. Explore DataLogger, AdvantageScope, and dashboards to help optimize your robot and solve issues.",
+      "speakers": [
+        "Team 7028"
+      ],
+      "presenter": "Team 7028"
+    },
+    {
+      "time_slot": "11:15AM - 12:05PM",
+      "round": "Round 3",
+      "room": "Glacier South",
+      "title": "Lumyn Labs Workshop",
+      "description": "Programmers encouraged to attend! This session will introduce Lumyn Labs, a new hardware startup, and provide a hands-on workshop for getting started with ConnectorX, an all-in-one LED controller and sensor breakout board designed with FRC in mind. Teams that bring a laptop will receive sample hardware to use during the workshop, offering a chance to explore and experiment with our tools.",
+      "speakers": [
+        "Levi Belland"
+      ],
+      "presenter": "Levi Belland"
+    },
+    {
+      "time_slot": "11:15AM - 12:05PM",
+      "round": "Round 3",
+      "room": "Glacier North",
+      "title": "Build Fast, Perform Better: Strategies for Quick Robot Construction and the Power of Practice",
+      "description": "This presentation will provide proven strategies to streamline your build process, allowing your team to finish your robot quickly and maximize time for testing, iteration, and practice. Learn how to set clear goals, use modular design, and prioritize essential functions to accelerate development. Discover how early completion enables more robust testing, faster troubleshooting, and improved performance on the field.",
+      "speakers": [
+        "Team 6045"
+      ],
+      "presenter": "Team 6045"
+    },
+    {
+      "time_slot": "11:15AM - 12:05PM",
+      "round": "Round 3",
+      "room": "Cascade",
+      "title": "4607 processes through Scouting and Strategy",
+      "description": "Showing the processes and techniques that 4607 uses and thrives on during the season and before it starts",
+      "speakers": [
+        "Team 4607"
+      ],
+      "presenter": "Team 4607"
+    },
+    {
+      "time_slot": "11:15AM - 12:05PM",
+      "round": "Round 3",
+      "room": "Theater",
+      "title": "Manipulators Part 3",
+      "description": "Part 3: Climbers, Kickers and Power",
+      "speakers": [
+        "Mark Durand"
+      ],
+      "presenter": "Mark Durand"
+    },
+    {
+      "time_slot": "11:15AM - 12:05PM",
+      "round": "Round 3",
+      "room": "Gallery",
+      "title": "What to Expect When Your Robot is Inspected.",
+      "description": "What to expect when you are inspected.   Tips and advice to make the inspection process smooth and painless.",
+      "speakers": [
+        "Team 8516"
+      ],
+      "presenter": "Team 8516"
+    },
+    {
+      "time_slot": "11:15AM - 12:05PM",
+      "round": "Round 3",
+      "room": "Alumni Room",
+      "title": "Booster Club Roundtable",
+      "description": "Discussion booster club support for robotics",
+      "speakers": [
+        "Various / Panel"
+      ],
+      "presenter": "Various / Panel"
+    },
+    {
+      "time_slot": "11:15AM - 12:05PM",
+      "round": "Round 3",
+      "room": "Mississippi",
+      "title": "Getting off the couch",
+      "description": "Essentially how to be motivated to participate and not just watch others do robotics when you don't know what to do.",
+      "speakers": [
+        "Team 3313"
+      ],
+      "presenter": "Team 3313"
+    },
+    {
+      "time_slot": "11:15AM - 12:05PM",
+      "round": "Round 3",
+      "room": "Valhalla",
+      "title": "Media Roundtable",
+      "description": "During this session, you will learn about how you can use social media to establish stronger ties within your community, strengthen partnerships with local businesses, and how to maintain proper etiquette on your business and social media platforms.",
+      "speakers": [
+        "Various / Panel"
+      ],
+      "presenter": "Various / Panel"
+    },
+    {
+      "time_slot": "12:05PM - 12:45PM",
+      "room": "Atwood Memorial Center",
+      "title": "Robot Showcase - Atwood Memorial Center; First Floor                                          SCSU Tours - Meet in Atwood Memorial Center, First Floor                                               Rooms and common areas are available for teams to use.",
+      "description": "Robot Showcase - Atwood Memorial Center; First Floor                                          SCSU Tours - Meet in Atwood Memorial Center, First Floor                                               Rooms and common areas are available for teams to use.",
+      "speakers": [
+        "Various / Panel"
+      ],
+      "presenter": "Various / Panel"
+    },
+    {
+      "time_slot": "12:45PM - 1:25PM",
+      "room": "Atwood Memorial Center",
+      "title": "Robot Showcase - Atwood Memorial Center; First Floor                                          SCSU Tours - Meet in Atwood Memorial Center, First Floor                                               Rooms and common areas are available for teams to use.",
+      "description": "Robot Showcase - Atwood Memorial Center; First Floor                                          SCSU Tours - Meet in Atwood Memorial Center, First Floor                                               Rooms and common areas are available for teams to use.",
+      "speakers": [
+        "Various / Panel"
+      ],
+      "presenter": "Various / Panel"
+    },
+    {
+      "time_slot": "1:30PM -   2:20PM",
+      "round": "Round 4",
+      "room": "Voyageurs South",
+      "title": "Importance of Battery Maintenance",
+      "description": "We will explain our best practices of wiring and storing batteries. Battery testing, labeling, and other maintenance will be explained.",
+      "speakers": [
+        "Team 4607"
+      ],
+      "presenter": "Team 4607"
+    },
+    {
+      "time_slot": "1:30PM -   2:20PM",
+      "round": "Round 4",
+      "room": "Voyageurs North",
+      "title": "FRC Java Programming",
+      "description": "Don't know where to start with FRC Java programming? Join this session to learn how to get set up and write an FRC Java program. We will cover the tools, learn about the lifecycle of a robot, and the basics of command-based programming.",
+      "speakers": [
+        "Team 7028"
+      ],
+      "presenter": "Team 7028"
+    },
+    {
+      "time_slot": "1:30PM -   2:20PM",
+      "round": "Round 4",
+      "room": "Glacier South",
+      "title": "The Long Game: Sustainable Team Practices",
+      "description": "Robotics teams often face difficult seasons marked by setbacks and change. This session will uncover the core principles that keep a team thriving through these challenges. We will share strategies that have helped Team 6709 S.P.U.D. INC builds resilience and stays adaptable. Whether you’re navigating leadership transitions or funding challenges, this session will equip your team with the tools to succeed.",
+      "speakers": [
+        "Team 6709"
+      ],
+      "presenter": "Team 6709"
+    },
+    {
+      "time_slot": "1:30PM -   2:20PM",
+      "round": "Round 4",
+      "room": "Glacier North",
+      "title": "Winning on the Field: Drive Team Strategy for FRC Success",
+      "description": "This presentation dives into the key components of effective drive team operations, including pre-match planning, in-match communication, and post-match evaluation. Learn how to analyze alliance strengths, adapt to your opponents, and make real-time decisions under pressure. Gain insights into the roles and responsibilities of each drive team member and discover how practicing together builds confidence and synergy.",
+      "speakers": [
+        "Team 6045"
+      ],
+      "presenter": "Team 6045"
+    },
+    {
+      "time_slot": "1:30PM -   2:20PM",
+      "round": "Round 4",
+      "room": "Cascade",
+      "title": "Design Team Round Table",
+      "description": "",
+      "speakers": [
+        "Various / Panel"
+      ],
+      "presenter": "Various / Panel"
+    },
+    {
+      "time_slot": "1:30PM -   2:20PM",
+      "round": "Round 4",
+      "room": "Theater",
+      "title": "Robotbuilder programming your Kit-bot",
+      "description": "First time programmers, use Robotbuilder to program your Robot. Set up Robotbuilder and explore Command Based Programming.",
+      "speakers": [
+        "Corey Applegate"
+      ],
+      "presenter": "Corey Applegate"
+    },
+    {
+      "time_slot": "1:30PM -   2:20PM",
+      "round": "Round 4",
+      "room": "Gallery",
+      "title": "Nuts and Bolts and Fasteners",
+      "description": "Learn the different types of fasteners used in the build process.  Also includes a discussion of drill bits, how to measure and identify metric/english threads, pop rivets, and drilling and tapping a hole.",
+      "speakers": [
+        "Team 8516"
+      ],
+      "presenter": "Team 8516"
+    },
+    {
+      "time_slot": "1:30PM -   2:20PM",
+      "round": "Round 4",
+      "room": "Alumni Room",
+      "title": "Impact Roundtable",
+      "description": "Group discussion about impact essay, presentation, executive summaries, and documentation. Compare and contrast team successes and share ideas.",
+      "speakers": [
+        "Various / Panel"
+      ],
+      "presenter": "Various / Panel"
+    },
+    {
+      "time_slot": "1:30PM -   2:20PM",
+      "round": "Round 4",
+      "room": "Mississippi",
+      "title": "See a need, fill a need",
+      "description": "Many ideas are lost because people never learn how to turn their ideas into actions. Throughout the session we will use the driver ramps to discuss the process of taking an idea and turning it into action. The session will highlight the key points necessary for a successful project.",
+      "speakers": [
+        "Team 3313"
+      ],
+      "presenter": "Team 3313"
+    },
+    {
+      "time_slot": "1:30PM -   2:20PM",
+      "round": "Round 4",
+      "room": "Valhalla",
+      "title": "Business within Robotics",
+      "description": "",
+      "speakers": [
+        "Team 6045"
+      ],
+      "presenter": "Team 6045"
+    },
+    {
+      "time_slot": "2:25PM - 3:15PM",
+      "round": "Round 5",
+      "room": "Voyageurs South",
+      "title": "How To Get Started with Powder Coating",
+      "description": "Have you been looking for ways to improve your robot’s visual appeal but don’t want to cover it in stickers or cheap spray paint? Try powder coating! Powder coating is the best way to spice up your robot’s looks while also providing immense benefits the structure and safety of your metal.",
+      "speakers": [
+        "Team 4607"
+      ],
+      "presenter": "Team 4607"
+    },
+    {
+      "time_slot": "2:25PM - 3:15PM",
+      "round": "Round 5",
+      "room": "Voyageurs North",
+      "title": "Future proofing your code",
+      "description": "A rundown on how to write your code so that it can be easily understood and built upon in the future",
+      "speakers": [
+        "Team 4607"
+      ],
+      "presenter": "Team 4607"
+    },
+    {
+      "time_slot": "2:25PM - 3:15PM",
+      "round": "Round 5",
+      "room": "Glacier South",
+      "title": "Robotics Through the Lens",
+      "description": "Learn how to choose the most effective photos and videos to tell your story and harness the rhetoric behind visuals to captivate your audience. We will also discuss setting clear goals for your media content and how these goals should shape your social media posts and videos. Join us as we share insights on what to post, what to avoid, and how to make your team’s achievements shine.",
+      "speakers": [
+        "Team 6709"
+      ],
+      "presenter": "Team 6709"
+    },
+    {
+      "time_slot": "2:25PM - 3:15PM",
+      "round": "Round 5",
+      "room": "Glacier North",
+      "title": "Building Bridges: Gaining School and Community Support for Your FRC Program",
+      "description": "This presentation explores strategies to engage administrators, teachers, parents, and local organizations in supporting your team’s mission. Learn how to showcase the value of your program through impactful storytelling, events, and demonstrations.",
+      "speakers": [
+        "Team 6045"
+      ],
+      "presenter": "Team 6045"
+    },
+    {
+      "time_slot": "2:25PM - 3:15PM",
+      "round": "Round 5",
+      "room": "Cascade",
+      "title": "Lumyn Labs Workshop",
+      "description": "Programmers encouraged to attend! This session will introduce Lumyn Labs, a new hardware startup, and provide a hands-on workshop for getting started with ConnectorX, an all-in-one LED controller and sensor breakout board designed with FRC in mind. Teams that bring a laptop will receive sample hardware to use during the workshop, offering a chance to explore and experiment with our tools.",
+      "speakers": [
+        "Levi Belland"
+      ],
+      "presenter": "Levi Belland"
+    },
+    {
+      "time_slot": "2:25PM - 3:15PM",
+      "round": "Round 5",
+      "room": "Theater",
+      "title": "Strategic Design",
+      "description": "A step by step guide for optimizing a team design decisions throughout the season. This presentation will outline the type of design decisions teams face from kickoff all the way through championships. In addition, we'll discuss how to factor in a team's unique resource limitations into their robot design. This presentation takes inspiration from Karthik's presentation given at the world championships.",
+      "speakers": [
+        "Matt C (Team 6045)"
+      ],
+      "presenter": "Matt C (Team 6045)"
+    },
+    {
+      "time_slot": "2:25PM - 3:15PM",
+      "round": "Round 5",
+      "room": "Gallery",
+      "title": "FIRST - A Safe Place To Fail",
+      "description": "We all love talking about our successes, but often we learn our best lessons through failure.  FIRST provides a safe environment to try new things and often fail.  Tell us about your failures and how (hopefully) you grew and learned from the experience.   Group discussion",
+      "speakers": [
+        "Team 8516"
+      ],
+      "presenter": "Team 8516"
+    },
+    {
+      "time_slot": "2:25PM - 3:15PM",
+      "round": "Round 5",
+      "room": "Alumni Room",
+      "title": "Mentor Roundtable",
+      "description": "A roundtable to discuss things imoacting Mentors in FRC.",
+      "speakers": [
+        "Various / Panel"
+      ],
+      "presenter": "Various / Panel"
+    },
+    {
+      "time_slot": "2:25PM - 3:15PM",
+      "round": "Round 5",
+      "room": "Mississippi",
+      "title": "Teamwork through Emotional Intelligence",
+      "description": "What if the same strategy to solve problems with your robot could be used with your team? In this innovative FIRST approach to emotional intelligence, Students and Mentors will learn the step-by-step \"programming\" and \"mechanics\" that create personal and team dynamics. Use these tools on and off the field to quickly decode and resolve issues, and build a calm and confident team - from the inside out!",
+      "speakers": [
+        "Amy K (Team 4728)"
+      ],
+      "presenter": "Amy K (Team 4728)"
+    },
+    {
+      "time_slot": "2:25PM - 3:15PM",
+      "round": "Round 5",
+      "room": "Valhalla",
+      "title": "Scouting to win: leveling up your data",
+      "description": "A first-time seminar on 2549's recent journey through the world of digital scouting. We'll be going over scouting data collection, visualization, and analysis from the perspective of a student who has designed and implemented these processes at competitions to both success and failure. We will discuss how to approach the design of these systems to be easily utilized, and how to implement them to effectively keep students engaged throughout competition.",
+      "speakers": [
+        "Team 2549"
+      ],
+      "presenter": "Team 2549"
+    },
+    {
+      "time_slot": "12:05PM - 1:25PM",
+      "room": "Garvey Commons",
+      "title": "Lunch Break",
+      "description": "Lunch served in Garvey Commons",
+      "speakers": []
+    }
+  ]
+}
