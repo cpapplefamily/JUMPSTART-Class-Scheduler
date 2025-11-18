@@ -1,20 +1,59 @@
-<!DOCTYPE html>
-<html>
-<head><title>Classroom {{.ID}}</title></head>
-<body>
-  <h1>Classroom {{.ID}} Schedule</h1>
-  <table border="1">
-    <tr><th>Start</th><th>End</th><th>Title</th><th>Presenter</th><th>Description</th></tr>
-    {{range .Sessions}}
-    <tr>
-      <td>{{.StartTime}}</td>
-      <td>{{.EndTime}}</td>
-      <td>{{.Title}}</td>
-      <td>{{.Presenter}}</td>
-      <td>{{.Description}}</td>
-    </tr>
+{{define "classroom.html"}}
+{{template "header-classroom.html" .}}
+
+<div class="classroom-page">
+    <div class="classroom-header">
+        <img src="/static/img/jumpstartTraining.png" alt="Jumpstart Training Logo" class="classroom-logo">
+        <div class="classroom-title">
+            <h1>{{.Name}}</h1>
+            <p class="subtitle">Today's Schedule • Classroom {{.ID}}</p>
+        </div>
+    </div>
+
+    {{if gt (len .Sessions) 0}}
+    <div class="schedule-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Session Title</th>
+                    <th>Presenter</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Sessions}}
+                <tr>
+                    <td class="time">
+                        <strong>{{.StartTime}}</strong><br>
+                        <span class="end-time">{{.EndTime}}</span>
+                    </td>
+                    <td class="title">
+                        {{if .Title}}{{.Title}}{{else}}<em>No title</em>{{end}}
+                    </td>
+                    <td class="presenter">
+                        {{if .Presenter}}{{.Presenter}}{{else}}<em>TBD</em>{{end}}
+                    </td>
+                    <td class="description">
+                        {{if .Description}}{{.Description}}{{else}}<em>No description</em>{{end}}
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+    {{else}}
+    <div class="empty-state">
+        <p>No sessions scheduled for today.</p>
+        <a href="/config" class="btn-primary">Configure Sessions</a>
+    </div>
     {{end}}
-  </table>
-  <a href="/">Back to Classrooms</a>
-</body>
-</html>
+
+    <div class="bottom-links">
+        <a href="/">Back to All Classrooms</a> • 
+        <a href="/config">Edit Schedule</a>
+    </div>
+</div>
+
+{{template "footer.html" .}}
+{{end}}

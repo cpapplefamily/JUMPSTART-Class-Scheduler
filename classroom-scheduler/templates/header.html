@@ -15,7 +15,10 @@
 <body>
     <header class="site-header">
         <div class="container">
-            <h1><a href="/" class="logo">JUMPSTART</a></h1>
+            <div id="logo">
+                <img src="/static/img/jumpstartTraining.png" alt="Classroom Scheduler" id="logoImg">
+            </div>
+        </div>
             <nav class="navbar">
                 <a href="/" class="{{if eq .Active "home"}}active{{end}}">Home</a>
                 <a href="/blocks" class="{{if eq .Active "blocks"}}active{{end}}">Configure Blocks</a>

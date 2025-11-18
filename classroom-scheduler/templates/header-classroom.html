@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Scheduler{{if .PageTitle}} • {{.PageTitle}}{{end}}</title>
+    
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    
+    <!-- Per-page CSS -->
+    {{range .ExtraCSS}}
+    <link rel="stylesheet" href="/static/css/{{.}}">
+    {{end}}
+</head>
+<body>
+    <header class="site-header classroom-mode">
+        <div class="container">
+            <div class="header-content">
+                <div id="logo">
+                    <img src="/static/img/jumpstartTraining.png" alt="Classroom Scheduler" id="logoImg">
+                </div>
+                <h1 class="header-title">{{if .PageTitle}}{{.PageTitle}}{{else}}Classroom Schedule{{end}}</h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        {{if .Flash}}
+        <div class="flash success">{{.Flash}}</div>
+        {{end}}

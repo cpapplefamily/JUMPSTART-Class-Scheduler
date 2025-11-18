@@ -94,5 +94,5 @@ func ConfigSaveHandler(w http.ResponseWriter, r *http.Request) {
 
 	saveClassroomsToDB()
 	saveSessionsToDB()
-	http.Redirect(w, r, "/config", http.StatusSeeOther)
+	http.Redirect(w, r, "/config?saved=All+classrooms+saved+successfully!", http.StatusSeeOther)
 }

@@ -1,0 +1,152 @@
+.classroom-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.classroom-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    color: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.classroom-logo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid rgba(255,255,255,0.3);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.classroom-title h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2.8rem;
+    font-weight: 700;
+}
+
+.classroom-title .subtitle {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1.3rem;
+}
+
+.schedule-table {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.schedule-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.1rem;
+}
+
+.schedule-table th {
+    background: #f8f9fa;
+    padding: 1.2rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid #667eea;
+}
+
+.schedule-table td {
+    padding: 1.2rem 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.schedule-table tr:hover {
+    background: #f0f4ff;
+    transition: background 0.2s;
+}
+
+.time {
+    font-weight: 600;
+    color: #667eea;
+    min-width: 120px;
+}
+
+.end-time {
+    font-size: 0.9em;
+    color: #999;
+}
+
+.title {
+    font-weight: 600;
+    color: #2c3e50;
+    min-width: 200px;
+}
+
+.presenter {
+    font-style: italic;
+    color: #5a67d8;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    color: #666;
+}
+
+.empty-state p {
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+}
+
+.btn-primary {
+    display: inline-block;
+    background: #667eea;
+    color: white;
+    padding: 0.8rem 1.8rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+    transition: all 0.3s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102,126,234,0.5);
+}
+
+.bottom-links {
+    text-align: center;
+    margin-top: 3rem;
+    font-size: 1.1rem;
+}
+
+.bottom-links a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.bottom-links a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .classroom-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    .classroom-title h1 {
+        font-size: 2.2rem;
+    }
+    .schedule-table table {
+        font-size: 1rem;
+    }
+}
