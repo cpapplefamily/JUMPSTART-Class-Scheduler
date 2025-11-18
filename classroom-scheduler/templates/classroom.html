@@ -7,8 +7,8 @@
     <tr><th>Start</th><th>End</th><th>Title</th><th>Presenter</th><th>Description</th></tr>
     {{range .Sessions}}
     <tr>
-      <td>{{.StartTime.Format "15:04"}}</td>
-      <td>{{.EndTime.Format "15:04"}}</td>
+      <td>{{.StartTime}}</td>
+      <td>{{.EndTime}}</td>
       <td>{{.Title}}</td>
       <td>{{.Presenter}}</td>
       <td>{{.Description}}</td>

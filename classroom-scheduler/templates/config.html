@@ -44,10 +44,10 @@
 
               <input type="text" name="title_{{$cl.ID}}_{{$idx0}}"
                      placeholder="Session Title"
-                     value="{{if $existing}}{{$existing.Title}}{{end}}" required>
+                     value="{{if $existing}}{{$existing.Title}}{{end}}" >
               <input type="text" name="presenter_{{$cl.ID}}_{{$idx0}}"
                      placeholder="Presenter"
-                     value="{{if $existing}}{{$existing.Presenter}}{{end}}" required>
+                     value="{{if $existing}}{{$existing.Presenter}}{{end}}">
               <textarea name="desc_{{$cl.ID}}_{{$idx0}}"
                         placeholder="Description (optional)">{{if $existing}}{{$existing.Description}}{{end}}</textarea>
             </div>
