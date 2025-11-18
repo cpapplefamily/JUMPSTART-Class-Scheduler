@@ -2,8 +2,40 @@
 
     <footer class="site-footer">
         <div class="container">
-            <p>&copy; {{.Year}} JUMPSTART • Powered by Freezy Arena</p>
+            <p>© {{.Year}} JUMPSTART • Powered by Freezy Arena</p>
         </div>
     </footer>
+
+    <!-- Global Scripts – loaded on every page -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <!-- Initialize Flatpickr on pages that have .timepicker inputs -->
+    {{if or (eq .Active "blocks") (eq .Active "config")}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            flatpickr(".timepicker", {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: true,
+                minuteIncrement: 5,
+                allowInput: true,
+                clickOpens: true,
+                static: true
+            });
+        });
+    </script>
+    {{end}}
+
+    <!-- Page-specific scripts -->
+    {{if eq .Active "blocks"}}
+        <script src="/static/js/blocks.js"></script>
+    {{end}}
+
+    {{if .Flash}}
+        <script src="/static/js/flash.js"></script>
+    {{end}}
+
 </body>
 </html>
